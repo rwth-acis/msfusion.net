@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FusionFramework", "FusionFramework\FusionFramework.csproj", "{ECC6A8F6-58E4-4C96-9FF8-E32DE236322D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FusionFramework", "FusionFramework\FusionFramework.csproj", "{ECC6A8F6-58E4-4C96-9FF8-E32DE236322D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContestManager", "ContestManager\ContestManager.csproj", "{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ECC6A8F6-58E4-4C96-9FF8-E32DE236322D} = {ECC6A8F6-58E4-4C96-9FF8-E32DE236322D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{ECC6A8F6-58E4-4C96-9FF8-E32DE236322D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECC6A8F6-58E4-4C96-9FF8-E32DE236322D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECC6A8F6-58E4-4C96-9FF8-E32DE236322D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
