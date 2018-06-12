@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Accord.MachineLearning.DecisionTrees;
 using Accord.MachineLearning.DecisionTrees.Learning;
+using ARLEMDecipher.Models.Workplaces.Sensors;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
@@ -27,6 +28,35 @@ namespace ContestManager
 
         static void Main(string[] args)
         {
+            // Step One Parse ARLEM document into object
+            ARLEMDecipher.ARLEMDecipher aRLEMDecipher = new ARLEMDecipher.ARLEMDecipher("127.0.0.1:8080");
+            aRLEMDecipher.LoadWorkplace(1);
+            int[] availableActivities = aRLEMDecipher.AvailableActivites();
+            if(availableActivities.Length > 0)
+            {
+                aRLEMDecipher.LoadActivity(availableActivities[0]);
+            }
+
+            List<VirtualSensor> Sensors = aRLEMDecipher.RequiredSensor();
+
+            Sensors.ForEach(sensor =>
+            {
+                // Check sensor's availibility by using mqtt client from framework
+            });
+
+            List<string> requiredModules = aRLEMDecipher.RequiredModules();
+
+            // If all sensors are available
+            requiredModules.ForEach(modules =>
+            {
+                // Check and load each trained modules
+            });
+
+
+
+
+
+
             // var virtualSensors = new VritualSensors();
             // virtualSensors.Add(new Accelerometer("ChestMounted", {Mean(), STD()}, 52, new SlidingWindow(200, 50));
             // virtualSensors.Add(new Accelerometer("ArmMounted", {Mean(), STD(), (double[]) => {return mean();}}, 52, new SlidingWindow(200, 50));
