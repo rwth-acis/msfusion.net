@@ -1,21 +1,47 @@
-﻿using Accord.Statistics.Models.Fields.Features;
+﻿using Accord.Math;
+using Accord.Statistics.Models.Fields.Features;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FusionFramework.Features
 {
-    class FeatureManager
+  
+
+    public class FeatureManager
     {
         public List<double> Generate(List<double[]> data, List<IFeature> features)
         {
             List<double> FeatureVector = new List<double>();
-            data.ForEach((double[] row) =>
+            double[][] Array = data.ToArray();
+            features.ForEach((IFeature Feature) =>
             {
-                features.ForEach((IFeature Feature) =>
+                if(Feature.UseColumns == null)
                 {
-                    FeatureVector.Add(Feature.Calculate(row));
-                });
+                    Feature.UseColumns = GetIndexFromRange(0, Array[0].Length, 1);
+                }
+
+                switch (Feature.Flavour)
+                {
+                    case FeatureFlavour.MatrixInValueOut:
+                        FeatureVector.Add(Feature.Calculate(Array));
+                        break;
+                    case FeatureFlavour.MatrixInVectorOut:
+                        FeatureVector.AddRange(Feature.Calculate(Array));
+                        break;
+                    case FeatureFlavour.VectorInVectorOut:
+                        foreach (var col in Feature.UseColumns)
+                        {
+                            FeatureVector.AddRange(Feature.Calculate(Array.GetColumn<double>(col)));
+                        }
+                        break;
+                    default:
+                        foreach (var col in Feature.UseColumns)
+                        {
+                            FeatureVector.Add(Feature.Calculate(Array.GetColumn<double>(col)));
+                        }
+                        break;
+                }
             });
             return FeatureVector;
         }
@@ -28,6 +54,16 @@ namespace FusionFramework.Features
                 FeatureVector.Add(Feature.Calculate(data));
             });
             return FeatureVector;
+        }
+
+        public int[] GetIndexFromRange(int start, int end, int increment)
+        {
+            List<int> Indices = new List<int>();
+            for(int i = start; i < end; i += increment)
+            {
+                Indices.Add(i);
+            }
+            return Indices.ToArray();
         }
     }
 }

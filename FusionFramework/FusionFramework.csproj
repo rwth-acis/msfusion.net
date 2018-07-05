@@ -1,22 +1,165 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EBF4F89C-B1E1-4222-B914-C1B734B5A999}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FusionFramework</RootNamespace>
+    <AssemblyName>FusionFramework</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
-
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Accord.Audio" Version="3.8.2-alpha" />
-    <PackageReference Include="Accord.MachineLearning.GPL" Version="3.8.2-alpha" />
-    <PackageReference Include="CsvHelper" Version="7.1.0" />
-    <PackageReference Include="encog-dotnet-core" Version="3.4.0" />
-    <PackageReference Include="M2Mqtt" Version="4.3.0" />
-    <PackageReference Include="MathNet.Numerics" Version="4.5.1" />
-    <PackageReference Include="Microsoft.ML" Version="0.2.0" />
-    <PackageReference Include="numl" Version="0.9.20-beta" />
+    <Reference Include="Accord, Version=3.8.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Accord.3.8.2-alpha\lib\net46\Accord.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Audio, Version=3.8.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Accord.Audio.3.8.2-alpha\lib\net46\Accord.Audio.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.MachineLearning, Version=3.8.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Accord.MachineLearning.3.8.2-alpha\lib\net46\Accord.MachineLearning.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Math, Version=3.8.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Accord.Math.3.8.2-alpha\lib\net46\Accord.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Math.Core, Version=3.8.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Accord.Math.3.8.2-alpha\lib\net46\Accord.Math.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Statistics, Version=3.8.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Accord.Statistics.3.8.2-alpha\lib\net46\Accord.Statistics.dll</HintPath>
+    </Reference>
+    <Reference Include="CsvHelper, Version=7.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.7.1.1\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="LumenWorks.Framework.IO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5ad3ea2f85776344, processorArchitecture=MSIL">
+      <HintPath>..\..\TrainingApps\packages\LumenWorksCsvReader.4.0.0\lib\net461\LumenWorks.Framework.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="M2Mqtt.Net, Version=4.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\M2Mqtt.4.3.0.0\lib\net45\M2Mqtt.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.4.5.1\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
-
   <ItemGroup>
+    <Compile Include="Classifiers\Boosting\AdaBoostClassifier.cs" />
+    <Compile Include="Classifiers\Trees\DecisionTreeClassifier.cs" />
+    <Compile Include="Classifiers\IClassifier.cs" />
+    <Compile Include="Classifiers\Analysis\LinearDiscriminantAnalysisClassifier.cs" />
+    <Compile Include="Classifiers\VectorMachines\MulticlassSupportVectorMachineClassifier.cs" />
+    <Compile Include="Classifiers\Regression\MultinomialLogisticRegressionClassifier.cs" />
+    <Compile Include="Classifiers\Trees\RandomForestClassifier.cs" />
+    <Compile Include="Core\Transformable.cs" />
+    <Compile Include="Data\Readers\CSVReader.cs" />
+    <Compile Include="Data\Readers\IReader.cs" />
+    <Compile Include="Data\Readers\MQTTReader.cs" />
+    <Compile Include="Data\Segmentators\SlidingWindow.cs" />
+    <Compile Include="Data\Transformers\Common\FourierTransform.cs" />
+    <Compile Include="Data\Transformers\Common\Normalize.cs" />
+    <Compile Include="Data\Transformers\Filters\EnvelopeFilter.cs" />
+    <Compile Include="Data\Transformers\Filters\HighPassFilter.cs" />
+    <Compile Include="Data\Transformers\Filters\LowPassFilter.cs" />
+    <Compile Include="Data\Transformers\IDataTransformer.cs" />
+    <Compile Include="Data\Transformers\Reducers\KernelPCAReducer.cs" />
+    <Compile Include="Data\Transformers\Reducers\PCAReducer.cs" />
+    <Compile Include="Features\Complex\AverageTimeBetweenPeaks.cs" />
+    <Compile Include="Features\Complex\BinDistribution.cs" />
+    <Compile Include="Features\Complex\HjorthParameters.cs" />
+    <Compile Include="Features\Complex\MeanAbsoluteDeviation.cs" />
+    <Compile Include="Features\FeatureManager.cs" />
+    <Compile Include="Features\IFeature.cs" />
+    <Compile Include="Features\TimeDomain\Correlation.cs" />
+    <Compile Include="Features\TimeDomain\Energy.cs" />
+    <Compile Include="Features\TimeDomain\Entropy.cs" />
+    <Compile Include="Features\TimeDomain\IndexMax.cs" />
+    <Compile Include="Features\TimeDomain\IndexMin.cs" />
+    <Compile Include="Features\TimeDomain\InterquartileRange.cs" />
+    <Compile Include="Features\TimeDomain\Kurtosis.cs" />
+    <Compile Include="Features\TimeDomain\Magnitude.cs" />
+    <Compile Include="Features\TimeDomain\Max.cs" />
+    <Compile Include="Features\TimeDomain\Mean.cs" />
+    <Compile Include="Features\TimeDomain\Median.cs" />
+    <Compile Include="Features\TimeDomain\Min.cs" />
+    <Compile Include="Features\TimeDomain\Mode.cs" />
+    <Compile Include="Features\TimeDomain\Percentile.cs" />
+    <Compile Include="Features\TimeDomain\Power.cs" />
+    <Compile Include="Features\TimeDomain\Range.cs" />
+    <Compile Include="Features\TimeDomain\RootMeanSquare.cs" />
+    <Compile Include="Features\TimeDomain\Skewness.cs" />
+    <Compile Include="Features\TimeDomain\StandardDeviation.cs" />
+    <Compile Include="Features\TimeDomain\Sum.cs" />
+    <Compile Include="Features\TimeDomain\Variance.cs" />
+    <Compile Include="FusionTask.cs" />
+    <Compile Include="Fusion\Strategies\DataInFeatureOut.cs" />
+    <Compile Include="Fusion\Strategies\DecisionsInDecisionOut.cs" />
+    <Compile Include="Fusion\Strategies\FeaturesInDecisionOut.cs" />
+    <Compile Include="Fusion\Strategies\FeaturesInFeatureOut.cs" />
+    <Compile Include="Fusion\Strategies\IFusionStrategy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\Logger.cs" />
+    <Compile Include="Utilities\TypeCasters.cs" />
+    <Compile Include="VirtualSensor\Accelerometer.cs" />
+    <Compile Include="VirtualSensor\Binary.cs" />
+    <Compile Include="VirtualSensor\Gyroscope.cs" />
+    <Compile Include="VirtualSensor\Hololens.cs" />
+    <Compile Include="VirtualSensor\IVirtualSensor.cs" />
+    <Compile Include="VirtualSensor\Kinect.cs" />
+    <Compile Include="VirtualSensor\Magetometer.cs" />
+    <Compile Include="VirtualSensor\Myo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
     <Folder Include="Features\FrequencyDomain\" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="docfx.json" />
+    <None Include="index.md" />
+    <None Include="packages.config" />
+    <None Include="toc.yml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Accord.3.8.2-alpha\build\Accord.targets" Condition="Exists('..\packages\Accord.3.8.2-alpha\build\Accord.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Accord.3.8.2-alpha\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Accord.3.8.2-alpha\build\Accord.targets'))" />
+    <Error Condition="!Exists('..\packages\docfx.console.2.36.2\build\docfx.console.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\docfx.console.2.36.2\build\docfx.console.targets'))" />
+  </Target>
+  <Import Project="..\packages\docfx.console.2.36.2\build\docfx.console.targets" Condition="Exists('..\packages\docfx.console.2.36.2\build\docfx.console.targets')" />
 </Project>

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Magnitude : IFeature
+    public class Magnitude : IFeature
     {
         public override dynamic Calculate(dynamic data)
         {

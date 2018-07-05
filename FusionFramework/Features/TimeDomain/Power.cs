@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System;
 
 namespace FusionFramework.Features.TimeDomain
 {
-    class Power : IFeature
+    public class Power : IFeature
     {
         public override dynamic Calculate(dynamic data)
         {
-            double[] tmp = (double[])data;
-            return Math.Pow(Accord.Audio.Tools.RootMeanSquare(tmp.Select(x => (float)x).ToArray()), 2);
+            double[] TempData = data;
+            return Math.Pow(Accord.Audio.Tools.RootMeanSquare(TempData.Select(x => (float)x).ToArray()), 2);
         }
     }
 }

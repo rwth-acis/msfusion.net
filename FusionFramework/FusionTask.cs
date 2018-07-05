@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace FusionFramework
 {
-    delegate void FusionFinished(int decision);
-    class FusionTask
+    public delegate void FusionFinished(int decision);
+    public class FusionTask
     {
         private List<IFusionStrategy> FusionTaskList = new List<IFusionStrategy>();
 

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Kurtosis : IFeature
+    public class Kurtosis : IFeature
     {
         public override dynamic Calculate(dynamic data)
         {

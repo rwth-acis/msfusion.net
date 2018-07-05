@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class StandardDeviation : IFeature
+    public class StandardDeviation : IFeature
     {
+        public StandardDeviation()
+        {
+        }
+        public StandardDeviation(int[] useColumns)
+        {
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             return Accord.Statistics.Circular.StandardDeviation(data);

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Percentile : IFeature
+    public class Percentile : IFeature
     {
         int Percentage;
 

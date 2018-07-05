@@ -2,10 +2,37 @@
 using System.Collections.Generic;
 using System.Text;
 
+/// <summary>
+/// Package for all the time domain and the frequency domain features.
+/// </summary>
 namespace FusionFramework.Features
 {
-    abstract class IFeature
+    public enum FeatureFlavour
     {
+        MatrixInValueOut,
+        MatrixInVectorOut,
+        VectorInValueOut,
+        VectorInVectorOut,
+
+    };
+
+    /// <summary>
+    /// Abstract class that every feature must override.
+    /// </summary>
+    public abstract class IFeature
+    {
+        public FeatureFlavour Flavour = FeatureFlavour.VectorInValueOut;
+
+        public bool ReturnsArray;
+
+        public int[] UseColumns;
+
+        /// <summary>
+        /// Calculate feature.
+        /// </summary>
+        /// <param name="data">Data to be calculated.</param>
+        /// <returns></returns>
         public abstract dynamic Calculate(dynamic data);
+
     }
 }

@@ -4,23 +4,30 @@ using System.Text;
 
 namespace FusionFramework.Features.Complex
 {
-    class AverageTimeBetweenPeaks : IFeature
+    public class AverageTimeBetweenPeaks : IFeature
     {
-        int PeakIndex;
-        public AverageTimeBetweenPeaks(int index)
+        double[] TimeStamps;
+        public AverageTimeBetweenPeaks(double[] timeIndex)
         {
-            PeakIndex = index;
+            TimeStamps = timeIndex;
+        }
+
+        public AverageTimeBetweenPeaks(double[] timeIndex, int[] useColumns)
+        {
+            UseColumns = useColumns;
+            TimeStamps = timeIndex;
         }
 
         public override dynamic Calculate(dynamic data)
         {
             int[] Peaks = Accord.Audio.Tools.FindPeaks(data);
-            double[] differece = new double[Peaks.Length];
-            for (int p = 1; p < Peaks.Length; p++)
+            List<double> differece = new List<double>();
+            foreach(var col in Peaks)
             {
-                differece[p] = data[p] - data[p - 1];
+                if(col != 0)
+                differece.Add(TimeStamps[col] - TimeStamps[col - 1]);
             }
-            return Accord.Statistics.Measures.Mean(differece);
+            return Accord.Statistics.Measures.Mean(differece.ToArray());
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace FusionFramework.Utilities
 {
-    class TypeCasters
+    public class TypeCasters
     {
         public static List<int[]> DoubleMultiArrayToInt(List<double[]> data)
         {
@@ -13,7 +13,7 @@ namespace FusionFramework.Utilities
             return Output;
         }
 
-        public static List<int> DoubleArrayToInt(List<double> data)
+        public static List<int> DoubleArrayToInt(List<int> data)
         {
             return data.ToArray().Select(Convert.ToInt32).ToList<int>();
         }

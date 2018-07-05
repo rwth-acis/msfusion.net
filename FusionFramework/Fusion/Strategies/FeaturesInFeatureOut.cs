@@ -7,23 +7,44 @@ using System.Text;
 
 namespace FusionFramework.Fusion.Strategies
 {
-    class FeaturesInFeatureOut : IFusionStrategy
+    /// <summary>
+    /// The feature in feature out is when both the input and output of the fusion process are features. Accordingly, this has been commonly referred to as feature fusion.
+    /// B. V. Dasarathy, “Sensor fusion potential exploitation-innovative architectures and illustrative applications,” Proc.IEEE, vol. 85, pp. 24–38, Jan. 1997.
+    /// </summary>
+    public class FeaturesInFeatureOut : IFusionStrategy
     {
+        /// <summary>
+        /// Reader to get data from either file or stream.
+        /// </summary>
         private IReader DataReader;
 
+        /// <summary>
+        /// Instantiate FeaturesInFeatureOut fusion strategy by setting important configurations.
+        /// </summary>
+        /// <param name="data">Data to be fuse.</param>
         public FeaturesInFeatureOut(List<double[]> data)
         {
             Data = data;
-            ExecutionMethod = Fuse;
+            StartReading = Fuse;
+            StopReading = Empty;
         }
 
+        /// <summary>
+        /// Instantiate FeaturesInFeatureOut fusion strategy by setting the reader.
+        /// </summary>
+        /// <param name="reader">Reader to be used.</param>
         public FeaturesInFeatureOut(IReader reader)
         {
             DataReader = reader;
             DataReader.OnReadFinished = OnReadFinished;
-            ExecutionMethod = DataReader.Start;
+            StartReading = DataReader.Start;
+            StopReading = DataReader.Stop;
         }
 
+        /// <summary>
+        /// Instantiate FeaturesInFeatureOut fusion strategy by providing other fusion strategies whose output would be used as an input for this fusion.
+        /// </summary>
+        /// <param name="fusionStrategies"></param>
         public FeaturesInFeatureOut(List<IFusionStrategy> fusionStrategies)
         {
             FusionStrategies = fusionStrategies;
@@ -33,35 +54,47 @@ namespace FusionFramework.Fusion.Strategies
                 {
                     if (IFusionStrategyFinished == FusionStrategies.Count)
                     {
+                        if(FusionStrategies.Count == 1)
+                        {
+                            FeatureVector = output;
+                        }
                         Fuse();
                     }
                     else
                     {
-                        FeatureVector.AddRange(new List<double>(output));
+                        List<double> o = output;
+                        FeatureVector.AddRange(o);
                         IFusionStrategyFinished++;
                     }
                 });
             });
         }
 
-        public override void Start() => ExecutionMethod();
+        /// <summary>
+        /// Start fusion process by calling configured delegate
+        /// </summary>
+        public override void Start() => StartReading();
 
+        /// <summary>
+        /// Stop fusion process by calling configured delegate
+        /// </summary>
+        public override void Stop() => StopReading();
+
+        /// <summary>
+        /// Fuse the data in to features
+        /// </summary>
         public void Fuse()
         {
-            PreProcess(ref Data);
-
-            List<double> NewFeatures = new List<double>();
-
-            foreach(double[] TmpData in Data)
-            {
-                NewFeatures.AddRange(new List<double>(TmpData));
-            }
-
-            PostProcess(ref Data);
-
-            OnFusionFinished(NewFeatures);
+            PostProcess(ref FeatureVector);
+            OnFusionFinished?.Invoke(FeatureVector);
+            FeatureVector = new List<double>();
+            IFusionStrategyFinished = 0;
         }
 
+        /// <summary>
+        /// When the reader completes reading.
+        /// </summary>
+        /// <param name="data">Data that has been read.</param>
         private void OnReadFinished(dynamic data)
         {
             Data = data;

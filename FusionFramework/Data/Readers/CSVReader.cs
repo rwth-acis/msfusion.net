@@ -1,48 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using CsvHelper;
+﻿using System.IO;
 using FusionFramework.Data.Segmentators;
 using System.Linq;
+using System.Collections.Generic;
+using System;
+using LumenWorks.Framework.IO.Csv;
+
 
 namespace FusionFramework.Core.Data.Reader
 {
-    class CSVReader : IReader
+    /// <summary>
+    /// Reads data from a CSV file.
+    /// </summary>
+    public class CSVReader<T> : IReader
     {
-        private CsvReader Client;
+        /// <summary>
+        /// Segmentation if required by client for the incoming data.
+        /// </summary>
+        protected SlidingWindow<T> Segmentator;
 
-
+        private CachedCsvReader Client;
+        
+        /// <summary>
+        /// Instantiate the CSV reader with file details.
+        /// </summary>
+        /// <param name="address">Location of the file.</param>
+        /// <param name="hasHeader">If file has headers or not.</param>
+        /// <param name="onReadFinished">Trigger when reading finished.</param>
         public CSVReader(string address, bool hasHeader, ReadFinished onReadFinished)
         {
             OnReadFinished = onReadFinished;
-            Client = new CsvReader(File.OpenText(address), hasHeader);
+            Client = new CachedCsvReader(new StreamReader(address), hasHeader);
         }
 
-        public CSVReader(string address, bool hasHeader, ReadFinished onReadFinished, ISegmentator segmentator)
+        /// <summary>
+        /// Instantiate the CSV reader with file details and segmentator.
+        /// </summary>
+        /// <param name="address">Location of the file.</param>
+        /// <param name="hasHeader">If file has headers or not.</param>
+        /// <param name="onReadFinished">Trigger when reading finished.</param>
+        /// <param name="segmentator">Segmentation class that breaks the file in segementation / windows</param>
+        public CSVReader(string address, bool hasHeader, ReadFinished onReadFinished, SlidingWindow<T> segmentator)
         {
             OnReadFinished = onReadFinished;
-            Client = new CsvReader(File.OpenText(address), hasHeader);
+            Client = new CachedCsvReader(new StreamReader(address), hasHeader);
             Segmentator = segmentator;
         }
 
+        /// <summary>
+        /// Start Reading
+        /// </summary>
         public override void Start()
         {
             if (Segmentator == null)
             {
-                OnReadFinished(Client.GetRecords<double[]>().ToList<double[]>());
-            } else
+                // OnReadFinished(Client.GetRecords<double[]>().ToList<double[]>());
+            }
+            else
             {
-                while (Client.Read())
+                List<List<T>> Output = new List<List<T>>();
+                while (Client.ReadNextRecord())
                 {
-                    if (Segmentator.Push(Client.GetRecord<double[]>()) == true)
+                    if(Segmentator.Push(Add()) == true)
                     {
-                        OnReadFinished(Segmentator.Window);
+                        Output.Add(Segmentator.Window);
                     }
                 }
+                OnReadFinished(Output);
             }
         }
 
-       
+        /// <summary>
+        /// Stop Reading
+        /// </summary>
+        public override void Stop()
+        {
+            Client.Dispose();
+        }
+
+        private T Add()
+        {
+            if (typeof(T) == typeof(double[]))
+            {
+                List<double> Tmp = new List<double>();
+                for (int i = 0; i < Client.FieldCount; i++)
+                {
+                    Tmp.Add(double.Parse(Client[i]));
+                }
+                return (T)Convert.ChangeType(Tmp.ToArray(), typeof(T));
+            }
+            else
+            {
+                return (T)Convert.ChangeType(Client[0], typeof(T));
+            }
+
+        }
     }
 }

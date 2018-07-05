@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FusionFramework.Features.Complex
 {
-    class HjorthParameters : IFeature
+    public class HjorthParameters : IFeature
     {
         public override dynamic Calculate(dynamic data)
         {

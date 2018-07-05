@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FusionFramework.Core.Utilities
 {
-    static class Logger
+    public static class Logger
     {
         public static void Log(string message)
         {

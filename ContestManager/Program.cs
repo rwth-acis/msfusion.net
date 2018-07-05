@@ -1,19 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-using Accord.MachineLearning.DecisionTrees;
-using Accord.MachineLearning.DecisionTrees.Learning;
-using ARLEMDecipher.Models.Workplaces.Sensors;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
 using Microsoft.ML.Transforms;
 using numl.Model;
 using numl.Supervised.DecisionTree;
+using ContestManager.Modules;
 
 namespace ContestManager
 {
@@ -29,52 +22,75 @@ namespace ContestManager
         static void Main(string[] args)
         {
             // Step One Parse ARLEM document into object
+            Console.WriteLine("Choose your workplace");
+            int WorkplaceId = int.Parse(Console.ReadLine());
+
             ARLEMDecipher.ARLEMDecipher aRLEMDecipher = new ARLEMDecipher.ARLEMDecipher("127.0.0.1:8080");
-            aRLEMDecipher.LoadWorkplace(1);
-            int[] availableActivities = aRLEMDecipher.AvailableActivites();
-            if(availableActivities.Length > 0)
+            if (!aRLEMDecipher.LoadWorkplace(WorkplaceId))
             {
-                aRLEMDecipher.LoadActivity(availableActivities[0]);
+                Console.ReadKey();
+                return;
             }
-
-            List<VirtualSensor> Sensors = aRLEMDecipher.RequiredSensor();
-
-            Sensors.ForEach(sensor =>
+            int[] availableActivities = aRLEMDecipher.AvailableActivites();
+            if (availableActivities.Length < 0)
             {
-                // Check sensor's availibility by using mqtt client from framework
+                Console.ReadKey();
+                return;
+            }
+ 
+            Console.WriteLine("Please Select an activity");
+            aRLEMDecipher.Workplace.Activities.ForEach(activity => {
+                Console.WriteLine(aRLEMDecipher.Workplace.Activities.IndexOf(activity) + ": " + activity.Name);
+            });
+            int ActivityId = int.Parse(Console.ReadLine());
+            aRLEMDecipher.LoadActivity(availableActivities[ActivityId]);
+            List<string> Sensors = aRLEMDecipher.AvailableSensors();
+
+            List<String> Modules = aRLEMDecipher.RequiredModules();
+            List<IModule> ModuleToExecute = new List<IModule>();
+
+            Modules.ForEach(moduleName =>
+            {
+                IModule BestFitModule = null;
+                IModule.ModuleMap[moduleName].ForEach(module =>
+                {
+                    if(module.IsCalculatable(Sensors))
+                    {
+                        BestFitModule = module;
+                    }
+                });
+                if(BestFitModule == null)
+                {
+                    Console.WriteLine(moduleName + " can't be calcualted with available sensors");
+                }
+                else
+                {
+                    ModuleToExecute.Add(BestFitModule);
+                }
             });
 
-            List<string> requiredModules = aRLEMDecipher.RequiredModules();
 
-            // If all sensors are available
-            requiredModules.ForEach(modules =>
+            Console.WriteLine("Activity requirs following sensors. Please connect your sensors and press any key to continue.");
+            ModuleToExecute.ForEach(module =>
             {
-                // Check and load each trained modules
+                module.RequiredSensors.ForEach(urn => Console.WriteLine(urn));
+                Console.WriteLine();
             });
-
-
-
-
-
-
-            // var virtualSensors = new VritualSensors();
-            // virtualSensors.Add(new Accelerometer("ChestMounted", {Mean(), STD()}, 52, new SlidingWindow(200, 50));
-            // virtualSensors.Add(new Accelerometer("ArmMounted", {Mean(), STD(), (double[]) => {return mean();}}, 52, new SlidingWindow(200, 50));
-
-            // var objFusionProcess = new FusionProcess();
-
-
-            // IntPtr fTask1 = objFusionProcess.Add(DataInFeatureOut(virtualSensors[0])));
-            // IntPtr fTask2 = objFusionProcess.Add(DataInFeatureOut(new MQTTReader("/path")));
-            // IntPtr fTask3 = objFusionProcess.Add(FeaturesInFeatureOut(fTask, fTask1));
-            // IntPtr fTask4 = objFusionProcess.Add(FeaturesInDecisionOut(fTask1, fTask2, randomForestClassifier));
-            // IntPtr fTask5 = objFusionProcess.Add(FeaturesInDecisionOut(fTask1, fTask2, logisticRegressionClassifier)));
-            // objFusionProcess.Add(DecisionsInDecisionOut(decision, adaBoostClassifier));
-
-            // objFusionProcess.Fuse(5000, ()=> {
-            //      // Fusion Done
-            // });
-
+            Console.ReadKey();
+            ModuleToExecute.ForEach(module =>
+            {
+                // No need as module already trainted
+                // module.Train();
+                module.Config((dynamic output) =>
+                {
+                    if(output == 1)
+                    {
+                        module.Stop();
+                    }
+                    Console.WriteLine(output);
+                });
+                module.Start();
+            });
 
         }
 
@@ -100,6 +116,7 @@ namespace ContestManager
             pipeline.Add(new FastTreeBinaryClassifier());
             var model = pipeline.Train<SentimentData, SentimentPrediction>();
         }
+        
 
        
 
@@ -115,7 +132,7 @@ namespace ContestManager
             Console.WriteLine(model);
         }
 
-        static void AccordTest ()
+        /*static void AccordTest ()
         {
             int[] ysequence = new int[] { 1, 2, 3, 2 };
 
@@ -175,7 +192,7 @@ namespace ContestManager
 
             Console.WriteLine("Hello World!");
             Console.ReadKey();        
-        }
+        }*/
     }
 
     public class Iris

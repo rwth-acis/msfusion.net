@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FusionFramework.Features.TimeDomain
 {
-    class Energy : IFeature
+    public class Energy : IFeature
     {
         int SampleRate;
         public Energy(int sampleRate)
@@ -16,7 +16,6 @@ namespace FusionFramework.Features.TimeDomain
         {
             Accord.Audio.Signal Signal = Accord.Audio.Signal.FromArray(data, SampleRate);
             return Signal.GetEnergy();
-
         }
     }
 }

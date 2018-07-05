@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FusionFramework.Features.Complex
 {
-    class MeanAbsoluteDeviation : IFeature
+    public class MeanAbsoluteDeviation : IFeature
     {
         public override dynamic Calculate(dynamic data)
         {
