@@ -7,6 +7,17 @@ namespace FusionFramework.Features.Complex
 {
     public class HjorthParameters : IFeature
     {
+        public HjorthParameters()
+        {
+            Flavour = FeatureFlavour.VectorInVectorOut;
+        }
+
+        public HjorthParameters(params int[] useColumns)
+        {
+            Flavour = FeatureFlavour.VectorInVectorOut;
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             return Execute(data);
@@ -14,17 +25,17 @@ namespace FusionFramework.Features.Complex
 
         public double[] Execute(double[] data)
         {
+            var dxV = data.Zip(data.Skip(1), (x, y) => y - x).ToList();
+            dxV.Insert(0, data[0]);
+            var ddxV = dxV.Zip(dxV.Skip(1), (x, y) => y - x).ToList();
+            ddxV.Insert(0, dxV[0]);
 
-            double[] datap = data.Select(x => Math.Pow(x, 2)).ToArray();
-            double[] datax = data.Zip(data.Skip(1), (a, b) => Math.Pow(b - a, 2)).ToArray();
-            double[] dataxx = datax.Zip(datax.Skip(1), (a, b) => Math.Pow(b - a, 2)).ToArray();
+            double mx2 = Accord.Statistics.Measures.Mean(data.Select(x => Math.Pow(x, 2)).ToArray());
+            double mdx2 = Accord.Statistics.Measures.Mean(dxV.Select(x => Math.Pow(x, 2)).ToArray());
+            double mddx2 = Accord.Statistics.Measures.Mean(ddxV.Select(x => Math.Pow(x, 2)).ToArray());
 
-            double mx2 = Accord.Statistics.Measures.Mean(datap);
-            double mx3 = Accord.Statistics.Measures.Mean(datax);
-            double mx4 = Accord.Statistics.Measures.Mean(dataxx);
-
-            double mob = mx3 / mx2;
-            return new double[] { Math.Sqrt(mob), Math.Sqrt(mx4 / mx3 - mob) };
+            double mob = mdx2 / mx2;
+            return new double[] { Math.Sqrt(mob), Math.Sqrt(mddx2 / mdx2 - mob) };
         }
     }
 }

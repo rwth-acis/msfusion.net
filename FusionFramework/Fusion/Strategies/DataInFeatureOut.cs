@@ -21,8 +21,6 @@ namespace FusionFramework.Fusion.Strategies
         /// </summary>
         private List<IFeature> Features;
 
-        private FeatureManager FeatureManager;
-
         /// <summary>
         /// Instantiate DataInFeaturOut fusion strategy by setting important configurations.
         /// </summary>
@@ -109,8 +107,6 @@ namespace FusionFramework.Fusion.Strategies
         public void Fuse()
         {
             PreProcess(ref Data);
-
-            FeatureManager = new FeatureManager();
             List<double> NewFeatures = FeatureManager.Generate(Data, Features);
             PostProcess(ref Data);
 
@@ -126,5 +122,6 @@ namespace FusionFramework.Fusion.Strategies
             Data = new List<double[]>(data);
             Fuse();
         }
+
     }
 }

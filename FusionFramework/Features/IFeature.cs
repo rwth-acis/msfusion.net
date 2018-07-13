@@ -16,6 +16,14 @@ namespace FusionFramework.Features
 
     };
 
+    public enum CorrelationAlgorithm
+    {
+        Pearson,
+        WeightedPearson,
+        Spearman
+
+    };
+
     /// <summary>
     /// Abstract class that every feature must override.
     /// </summary>

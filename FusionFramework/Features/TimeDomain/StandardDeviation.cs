@@ -5,7 +5,7 @@
         public StandardDeviation()
         {
         }
-        public StandardDeviation(int[] useColumns)
+        public StandardDeviation(params int[] useColumns)
         {
             UseColumns = useColumns;
         }

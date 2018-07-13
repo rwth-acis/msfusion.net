@@ -37,7 +37,7 @@ namespace FusionFramework.Core
         /// </summary>
         /// <param name="dataTransformer">Transformation operation.</param>
         /// <param name="isPreProcessor">Is a pre-processor or post-processor</param>
-        public void Add(IDataTransformer dataTransformer, bool isPreProcessor)
+        public void Add(IDataTransformer dataTransformer, bool isPreProcessor = true)
         {
             if (isPreProcessor)
             {
@@ -55,7 +55,7 @@ namespace FusionFramework.Core
         /// <param name="Data">Matrix to be pre-processed.</param>
         public void PreProcess(ref List<double[]> Data)
         {
-            if(PreProcessors.Count > 0)
+            if (PreProcessors.Count > 0)
             {
                 List<double[]> tmp = Data;
                 PreProcessors.ForEach(delegate (IDataTransformer transformer)

@@ -1,24 +1,27 @@
 ﻿using Accord.Math;
 using Accord.Statistics.Models.Fields.Features;
+using FusionFramework.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FusionFramework.Features
 {
-  
 
-    public class FeatureManager
+    public class FeatureManager : Transformable
     {
-        public List<double> Generate(List<double[]> data, List<IFeature> features)
+        List<IFeature> Features = new List<IFeature>();
+
+        public static List<double> Generate(List<double[]> data, List<IFeature> features)
         {
+            
             List<double> FeatureVector = new List<double>();
             double[][] Array = data.ToArray();
             features.ForEach((IFeature Feature) =>
             {
-                if(Feature.UseColumns == null)
+                if (Feature.UseColumns == null)
                 {
-                    Feature.UseColumns = GetIndexFromRange(0, Array[0].Length, 1);
+                    Feature.UseColumns = FeatureManager.GetIndexFromRange(0, Array[0].Length, 1);
                 }
 
                 switch (Feature.Flavour)
@@ -46,7 +49,15 @@ namespace FusionFramework.Features
             return FeatureVector;
         }
 
-        public List<double> Generate(double[] data, List<IFeature> features)
+        public List<double> Generate(List<double[]> data)
+        {
+            PreProcess(ref data);
+            var Tmp = Generate(data, Features);
+            PostProcess(ref Tmp);
+            return Tmp;
+        }
+
+        public static List<double> Generate(double[] data, List<IFeature> features)
         {
             List<double> FeatureVector = new List<double>();
             features.ForEach((IFeature Feature) =>
@@ -56,14 +67,25 @@ namespace FusionFramework.Features
             return FeatureVector;
         }
 
-        public int[] GetIndexFromRange(int start, int end, int increment)
+        public List<double> Generate(double[] data)
+        {
+            return Generate(data, Features);
+        }
+
+        public static int[] GetIndexFromRange(int start, int end, int increment)
         {
             List<int> Indices = new List<int>();
-            for(int i = start; i < end; i += increment)
+            for (int i = start; i < end; i += increment)
             {
                 Indices.Add(i);
             }
             return Indices.ToArray();
         }
+
+        public void Add(IFeature feature)
+        {
+            Features.Add(feature);
+        }
+        
     }
 }

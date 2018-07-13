@@ -18,6 +18,17 @@ namespace FusionFramework.Classifiers.Analysis
         /// </summary>
         LinearDiscriminantAnalysis LearningAlgorithm;
 
+        public LinearDiscriminantAnalysisClassifier()
+        {
+            LearningAlgorithm = new LinearDiscriminantAnalysis();
+        }
+
+        public LinearDiscriminantAnalysisClassifier(string path)
+        {
+            LearningAlgorithm = new LinearDiscriminantAnalysis();
+            Load(path);
+        }
+
         /// <summary>
         /// Model that will be used for classification and training
         /// </summary>
@@ -41,10 +52,8 @@ namespace FusionFramework.Classifiers.Analysis
         /// <param name="calculateError">The boolean check to tell if the training error should be calculated.</param>
         public override void Train(List<double[]> trainingData, List<int> trainingLabels, bool calculateError = true)
         {
-            int[] TrainingLabels = TypeCasters.DoubleArrayToInt(trainingLabels).ToArray();
-            double[][] TrainingData = trainingData.ToArray();
-            Model = LearningAlgorithm.Learn(TrainingData, TrainingLabels);
-            if(calculateError == true)
+            Model = LearningAlgorithm.Learn(trainingData.ToArray(), trainingLabels.ToArray());
+            if (calculateError == true)
             {
                 CalculateTrainingError(trainingData, trainingLabels);
             }
@@ -88,7 +97,8 @@ namespace FusionFramework.Classifiers.Analysis
         /// <param name="testOutput">The test labels that would be used to calculate error.</param>
         public override void CalculateTrainingError(List<double[]> testData, List<int> testOutput)
         {
-            TrainingError = new ZeroOneLoss(testData.ToArray()).Loss(Model.Decide(testData.ToArray()));
+            int[] res = Model.Decide(testData.ToArray());
+            TrainingError = new ZeroOneLoss(testOutput.ToArray()).Loss(res);
         }
     }
 }

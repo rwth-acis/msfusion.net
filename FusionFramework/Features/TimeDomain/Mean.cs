@@ -7,7 +7,7 @@ namespace FusionFramework.Features.TimeDomain
         {
             Flavour = FeatureFlavour.VectorInValueOut;
         }
-        public Mean(int[] useColumns)
+        public Mean(params int[] useColumns)
         {
             UseColumns = useColumns;
         }

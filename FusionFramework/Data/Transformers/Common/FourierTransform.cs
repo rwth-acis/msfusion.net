@@ -21,7 +21,7 @@ namespace FusionFramework.Data.Transformers.Common
         /// </summary>
         /// <param name="data">Signal to be transformed.</param>
         /// <returns></returns>
-        public Complex[,] Transform(ref List<double[]> data)
+        public Complex[,] Transform(List<double[]> data)
         {
             Complex[][] ComplexArray = data.ConvertAll<Complex[]>(new Converter<double[], Complex[]>(DoubleToComplex)).ToArray();
             Complex[,] ComplexMatrix = new Complex[ComplexArray.GetLength(0), ComplexArray.GetLength(1)];

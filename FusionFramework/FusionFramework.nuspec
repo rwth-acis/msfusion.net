@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>rizalishan</authors>
+    <owners>rizalishan</owners>
+    <licenseUrl>https://github.com/rwth-acis/msfusion.net</licenseUrl>
+    <projectUrl>https://github.com/rwth-acis/msfusion.net</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A multisensor data fusion framework.</description>
+    <copyright>Copyright 2018</copyright>
+  </metadata>
+</package>

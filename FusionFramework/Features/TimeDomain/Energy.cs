@@ -7,8 +7,14 @@ namespace FusionFramework.Features.TimeDomain
     public class Energy : IFeature
     {
         int SampleRate;
+
         public Energy(int sampleRate)
         {
+            SampleRate = sampleRate;
+        }
+        public Energy(int sampleRate, params int[] useColumns)
+        {
+            UseColumns = useColumns;
             SampleRate = sampleRate;
         }
 

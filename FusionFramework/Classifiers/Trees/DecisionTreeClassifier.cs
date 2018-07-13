@@ -35,6 +35,12 @@ namespace FusionFramework.Classifiers.Trees
             LearningAlgorithmName = algorithm;
         }
 
+        public DecisionTreeClassifier(string path)
+        {
+            Load(path);
+        }
+
+
         /// <summary>
         /// Perform classification from loaded model and returns the infered class.
         /// </summary>
@@ -44,7 +50,7 @@ namespace FusionFramework.Classifiers.Trees
         {
             return Model.Decide(vector.ToArray());
         }
-      
+
         /// <summary>
         /// Trains the classifier and computes the training error if option provided.
         /// </summary>
@@ -65,7 +71,7 @@ namespace FusionFramework.Classifiers.Trees
             }
 
             Model = LearningAlgorithm.Learn(trainingData.ToArray(), trainingLabels.ToArray());
-            if(calculateError == true)
+            if (calculateError == true)
             {
                 CalculateTrainingError(trainingData, trainingLabels);
             }

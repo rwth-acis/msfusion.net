@@ -18,5 +18,12 @@ namespace FusionFramework.VirtualSensor
 
             Window = new SlidingWindow<double[]>(windowSize, overlap);
         }
+
+        public Accelerometer(string mqttURL, int windowSize, int overlap, IFeature[] features)
+        {
+            MqttUrl = mqttURL;
+            Features = features;
+            Window = new SlidingWindow<double[]>(windowSize, overlap);
+        }
     }
 }

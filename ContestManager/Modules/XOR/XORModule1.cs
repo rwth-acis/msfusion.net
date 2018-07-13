@@ -32,16 +32,9 @@ namespace ContestManager.Modules.XOR
 
         }
 
-        public override bool IsCalculatable(List<string> availableSensors)
-        {
-            if(RequiredSensors.Intersect<string>(availableSensors).Count() > 0)
-            {
-                return false;
-            }
-            return true;
-        }
-      
-        public override void Config(FusionFinished fusionFinished)
+        
+
+        public void PreConfig()
         {
             Classifier = new MulticlassSupportVectorMachineClassifier();
             Classifier.Load("XORModule1");
@@ -49,8 +42,20 @@ namespace ContestManager.Modules.XOR
             Feature2 = new DataInFeatureOut(BinaryTwo.GetConfiguration().Reader, BinaryTwo.GetConfiguration().Features);
             FilteredFeatures = new FeaturesInFeatureOut(new List<IFusionStrategy>() { Feature1, Feature2 });
             Decision = new FeaturesInDecisionOut(new List<IFusionStrategy>() { FilteredFeatures }, Classifier);
+
+        }
+
+        public override void Config(FusionFinished fusionFinished)
+        {
+            PreConfig();
             Decision.OnFusionFinished = fusionFinished;
         }
+
+        public override IFusionStrategy Config()
+        {
+            PreConfig();
+            return Decision;
+        }       
 
         public override void Train()
         {
@@ -94,6 +99,11 @@ namespace ContestManager.Modules.XOR
         {
             Feature1.Stop();
             Feature2.Stop();
+        }
+
+        public override void DecisionToMessage(int decision)
+        {
+            throw new NotImplementedException();
         }
     }
 }

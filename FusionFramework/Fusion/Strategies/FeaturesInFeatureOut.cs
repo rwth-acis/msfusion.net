@@ -1,4 +1,5 @@
-﻿using FusionFramework.Core.Data.Reader;
+﻿using FusionFramework.Core;
+using FusionFramework.Core.Data.Reader;
 using FusionFramework.Data.Transformers;
 using FusionFramework.Features;
 using System;
@@ -18,6 +19,8 @@ namespace FusionFramework.Fusion.Strategies
         /// </summary>
         private IReader DataReader;
 
+        private CoreBuffer<double[]> FeatureBuffer;
+
         /// <summary>
         /// Instantiate FeaturesInFeatureOut fusion strategy by setting important configurations.
         /// </summary>
@@ -27,6 +30,7 @@ namespace FusionFramework.Fusion.Strategies
             Data = data;
             StartReading = Fuse;
             StopReading = Empty;
+            FeatureBuffer = new CoreBuffer<double[]>(OnBufferFinished, 1);
         }
 
         /// <summary>
@@ -39,6 +43,7 @@ namespace FusionFramework.Fusion.Strategies
             DataReader.OnReadFinished = OnReadFinished;
             StartReading = DataReader.Start;
             StopReading = DataReader.Stop;
+            FeatureBuffer = new CoreBuffer<double[]>(OnBufferFinished, 1);
         }
 
         /// <summary>
@@ -47,12 +52,18 @@ namespace FusionFramework.Fusion.Strategies
         /// <param name="fusionStrategies"></param>
         public FeaturesInFeatureOut(List<IFusionStrategy> fusionStrategies)
         {
+            FeatureBuffer = new CoreBuffer<double[]>(OnBufferFinished, fusionStrategies.Count);
             FusionStrategies = fusionStrategies;
+            int TmpIndex = 0;
             FusionStrategies.ForEach((IFusionStrategy fusionStrategy) =>
             {
+                fusionStrategy.Id = TmpIndex;
+                TmpIndex++;
                 fusionStrategy.OnFusionFinished = ((dynamic output) =>
                 {
-                    if (IFusionStrategyFinished == FusionStrategies.Count)
+                    FeatureBuffer.Push(((List<double>)output).ToArray(), fusionStrategy.Id);
+
+                    /*if (IFusionStrategyFinished == FusionStrategies.Count)
                     {
                         if(FusionStrategies.Count == 1)
                         {
@@ -62,10 +73,9 @@ namespace FusionFramework.Fusion.Strategies
                     }
                     else
                     {
-                        List<double> o = output;
-                        FeatureVector.AddRange(o);
+                        FeatureVector.AddRange(output);
                         IFusionStrategyFinished++;
-                    }
+                    }*/
                 });
             });
         }
@@ -98,6 +108,16 @@ namespace FusionFramework.Fusion.Strategies
         private void OnReadFinished(dynamic data)
         {
             Data = data;
+            Fuse();
+        }
+
+        private void OnBufferFinished(dynamic data)
+        {
+            Data = (List<double[]>) data;
+            Data.ForEach(vector =>
+            {
+                FeatureVector.AddRange(vector);
+            });
             Fuse();
         }
     }

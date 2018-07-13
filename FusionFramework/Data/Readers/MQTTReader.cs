@@ -26,7 +26,7 @@ namespace FusionFramework.Core.Data.Reader
         /// <param name="subscriberURL">MQTT topic address</param>
         public MQTTReader(string subscriberURL)
         {
-            Client = new MqttClient("cloud11.dbis.rwth-aachen.de");
+            Client = new MqttClient("iot.eclipse.org");
             Client.Connect(Guid.NewGuid().ToString());
 
             Client.MqttMsgPublishReceived += MessageArrivedCallback;
@@ -40,7 +40,7 @@ namespace FusionFramework.Core.Data.Reader
         /// <param name="onReadFinished">Trigger when reading finished.</param>
         public MQTTReader(string subscriberURL, ReadFinished onReadFinished)
         {
-            Client = new MqttClient("cloud11.dbis.rwth-aachen.de");
+            Client = new MqttClient("iot.eclipse.org");
             Client.Connect(Guid.NewGuid().ToString());
 
             Client.MqttMsgPublishReceived += MessageArrivedCallback;
@@ -55,7 +55,7 @@ namespace FusionFramework.Core.Data.Reader
         /// <param name="segmentator">Segmentation class that breaks the file in segementation / windows</param>
         public MQTTReader(string subscriberURL, SlidingWindow<T> segmentator)
         {
-            Client = new MqttClient("cloud11.dbis.rwth-aachen.de");
+            Client = new MqttClient("iot.eclipse.org");
             Client.Connect(Guid.NewGuid().ToString());
 
             Client.MqttMsgPublishReceived += MessageArrivedSegmentedCallback;
@@ -89,6 +89,8 @@ namespace FusionFramework.Core.Data.Reader
         {
             try
             {
+                var s = System.Text.Encoding.UTF8.GetString(e.Message);
+
                 if (Segmentator.Push((T)Convert.ChangeType(Array.ConvertAll(System.Text.Encoding.UTF8.GetString(e.Message).Split(','), double.Parse), typeof(T))) == true)
                 {
                     OnReadFinished(Segmentator.Window);
@@ -118,7 +120,7 @@ namespace FusionFramework.Core.Data.Reader
         {
             try
             {
-                MqttClient mqttClient = new MqttClient("cloud11.dbis.rwth-aachen.de");
+                MqttClient mqttClient = new MqttClient("iot.eclipse.org");
                 mqttClient.Connect(Guid.NewGuid().ToString());
                 mqttClient.Disconnect();
             }
@@ -128,6 +130,11 @@ namespace FusionFramework.Core.Data.Reader
                 // TODO: Terminate app
             }
 
-        }        
+        }
+
+        public void Add(SlidingWindow<T> slidingWindow)
+        {
+            Segmentator = slidingWindow;
+        }
     }
 }

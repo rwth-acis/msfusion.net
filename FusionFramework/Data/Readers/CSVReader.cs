@@ -6,6 +6,7 @@ using System;
 using LumenWorks.Framework.IO.Csv;
 
 
+
 namespace FusionFramework.Core.Data.Reader
 {
     /// <summary>
@@ -19,7 +20,18 @@ namespace FusionFramework.Core.Data.Reader
         protected SlidingWindow<T> Segmentator;
 
         private CachedCsvReader Client;
-        
+
+        /// <summary>
+        /// Instantiate the CSV reader with file details.
+        /// </summary>
+        /// <param name="address">Location of the file.</param>
+        /// <param name="hasHeader">If file has headers or not.</param>
+        /// <param name="onReadFinished">Trigger when reading finished.</param>
+        public CSVReader(string address, bool hasHeader = false)
+        {
+            Client = new CachedCsvReader(new StreamReader(address), hasHeader);
+        }
+
         /// <summary>
         /// Instantiate the CSV reader with file details.
         /// </summary>
@@ -53,14 +65,19 @@ namespace FusionFramework.Core.Data.Reader
         {
             if (Segmentator == null)
             {
-                // OnReadFinished(Client.GetRecords<double[]>().ToList<double[]>());
+                List<T> output = new List<T>();
+                while (Client.ReadNextRecord())
+                {
+                    output.Add(Insert());
+                }
+                OnReadFinished(output);
             }
             else
             {
                 List<List<T>> Output = new List<List<T>>();
                 while (Client.ReadNextRecord())
                 {
-                    if(Segmentator.Push(Add()) == true)
+                    if (Segmentator.Push(Insert()) == true)
                     {
                         Output.Add(Segmentator.Window);
                     }
@@ -77,7 +94,7 @@ namespace FusionFramework.Core.Data.Reader
             Client.Dispose();
         }
 
-        private T Add()
+        private T Insert()
         {
             if (typeof(T) == typeof(double[]))
             {
@@ -94,5 +111,11 @@ namespace FusionFramework.Core.Data.Reader
             }
 
         }
+
+        public void Add(SlidingWindow<T> slidingWindow)
+        {
+            Segmentator = slidingWindow;
+        }
+
     }
 }

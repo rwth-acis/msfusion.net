@@ -36,5 +36,10 @@ namespace FusionFramework.Core.Data.Reader
         /// </summary>
         public abstract void Stop();
 
+        public void Add(ReadFinished onReadFinished)
+        {
+            OnReadFinished = onReadFinished;
+        }
+
     }
 }

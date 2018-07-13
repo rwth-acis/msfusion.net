@@ -26,6 +26,8 @@ namespace FusionFramework.Fusion.Strategies
     /// </summary>
     public abstract class IFusionStrategy : Transformable
     {
+        public int Id;
+
         /// <summary>
         /// Data to be fused
         /// </summary>

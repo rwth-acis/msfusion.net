@@ -15,7 +15,7 @@ namespace FusionFramework.Features.Complex
             ReturnsArray = true;
             BinCount = binCount;
         }
-        public BinDistribution(int binCount, int[] useColumns)
+        public BinDistribution(int binCount, params int[] useColumns)
         {
             Flavour = FeatureFlavour.VectorInVectorOut;
             ReturnsArray = true;
