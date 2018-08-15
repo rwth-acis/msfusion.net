@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FusionFramework.Utilities;
 using Accord.Math.Optimization.Losses;
 using Accord.MachineLearning.DecisionTrees;
+using Accord.Statistics.Analysis;
 
 namespace FusionFramework.Classifiers.Trees
 {
@@ -116,6 +117,11 @@ namespace FusionFramework.Classifiers.Trees
         public override void CalculateTrainingError(List<double[]> testData, List<int> testOutput)
         {
             TrainingError = new ZeroOneLoss(testOutput.ToArray()).Loss(Model.Decide(testData.ToArray()));
+            GeneralConfusionMatrix cm = GeneralConfusionMatrix.Estimate(Model, testData.ToArray(), testOutput.ToArray());
+            double error = cm.Error;         // should be 0.066666666666666652
+            double accuracy = cm.Accuracy;   // should be 0.93333333333333335
+            double kappa = cm.Kappa;         // should be 0.9
+            double chiSquare = cm.ChiSquare; // should be 248.52216748768473
         }
     }
 }

@@ -14,7 +14,6 @@ namespace FusionFramework.Features
 
         public static List<double> Generate(List<double[]> data, List<IFeature> features)
         {
-            
             List<double> FeatureVector = new List<double>();
             double[][] Array = data.ToArray();
             features.ForEach((IFeature Feature) =>
@@ -86,6 +85,6 @@ namespace FusionFramework.Features
         {
             Features.Add(feature);
         }
-        
+
     }
 }

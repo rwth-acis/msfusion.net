@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classifiers\Boosting\AdaBoostClassifier.cs" />
+    <Compile Include="Classifiers\CustomClassifier.cs" />
     <Compile Include="Classifiers\Trees\DecisionTreeClassifier.cs" />
     <Compile Include="Classifiers\IClassifier.cs" />
     <Compile Include="Classifiers\Analysis\LinearDiscriminantAnalysisClassifier.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Features\TimeDomain\Median.cs" />
     <Compile Include="Features\TimeDomain\Min.cs" />
     <Compile Include="Features\TimeDomain\Mode.cs" />
+    <Compile Include="Features\TimeDomain\MyCustomFeature.cs" />
     <Compile Include="Features\TimeDomain\Percentile.cs" />
     <Compile Include="Features\TimeDomain\Power.cs" />
     <Compile Include="Features\TimeDomain\Range.cs" />
@@ -125,15 +127,20 @@
     <Compile Include="Features\TimeDomain\Variance.cs" />
     <Compile Include="Features\TimeDomain\SumLargerThan.cs" />
     <Compile Include="Features\TimeDomain\ZeroCrossing.cs" />
-    <Compile Include="FusionTask.cs" />
     <Compile Include="Fusion\Strategies\DataInFeatureOut.cs" />
     <Compile Include="Fusion\Strategies\DecisionsInDecisionOut.cs" />
     <Compile Include="Fusion\Strategies\FeaturesInDecisionOut.cs" />
     <Compile Include="Fusion\Strategies\FeaturesInFeatureOut.cs" />
     <Compile Include="Fusion\Strategies\IFusionStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\Logger.cs" />
     <Compile Include="Utilities\TypeCasters.cs" />
+    <Compile Include="VirtualSensor\Myo.cs" />
     <Compile Include="VirtualSensor\Accelerometer.cs" />
     <Compile Include="VirtualSensor\Binary.cs" />
     <Compile Include="VirtualSensor\Gyroscope.cs" />
@@ -148,6 +155,7 @@
     <Folder Include="Features\FrequencyDomain\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="docfx.json" />
     <None Include="index.md" />
     <None Include="packages.config" />
@@ -155,6 +163,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -16,7 +16,8 @@ namespace FusionFramework.Features.TimeDomain
 
         public override dynamic Calculate(dynamic data)
         {
-            return Array.IndexOf(data, data.Min());
+            var DoubleData = ((double[])data);
+            return Array.IndexOf(DoubleData, DoubleData.Min());
         }
     }
 }

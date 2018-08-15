@@ -18,20 +18,6 @@ using FusionFramework.Utilities;
 
 namespace ContestManager.Modules.HGR
 {
-    class ResultantAcceleration : FusionFramework.Features.IFeature
-    {
-        public ResultantAcceleration()
-        {
-            Flavour = FeatureFlavour.MatrixInValueOut;
-        }
-
-        public override dynamic Calculate(dynamic data)
-        {
-            double[][] Array = data;
-            return new Mean().Calculate(Array.Select(x => (double)new Magnitude().Calculate(x)).ToArray<double>());
-        }
-    }
-
     class FrequenceyFeature : FusionFramework.Features.IFeature
     {
         public FrequenceyFeature()

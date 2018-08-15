@@ -1,6 +1,7 @@
 ﻿using Accord.MachineLearning.VectorMachines;
 using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Math.Optimization.Losses;
+using Accord.Statistics.Analysis;
 using Accord.Statistics.Kernels;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,12 @@ namespace FusionFramework.Classifiers.VectorMachines
         /// <param name="testOutput">The test labels that would be used to calculate error.</param>
         public override void CalculateTrainingError(List<double[]> testData, List<int> testOutput)
         {
-            TrainingError = new ZeroOneLoss(testData.ToArray()).Loss(Model.Decide(testData.ToArray()));
+            TrainingError = new ZeroOneLoss(testOutput.ToArray()).Loss(Model.Decide(testData.ToArray()));
+            GeneralConfusionMatrix cm = GeneralConfusionMatrix.Estimate(Model, testData.ToArray(), testOutput.ToArray());
+            double error = cm.Error;         // should be 0.066666666666666652
+            double accuracy = cm.Accuracy;   // should be 0.93333333333333335
+            double kappa = cm.Kappa;         // should be 0.9
+            double chiSquare = cm.ChiSquare; // should be 248.52216748768473
         }
 
     }

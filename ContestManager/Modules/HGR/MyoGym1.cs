@@ -15,20 +15,19 @@ using FusionFramework.Classifiers.Trees;
 using FusionFramework.VirtualSensor;
 using System.IO;
 using FusionFramework.Utilities;
+using FusionFramework.Classifiers.VectorMachines;
 
 namespace ContestManager.Modules.HGR
 {
 
     class MyoGym1 : IModule
     {
-        Accelerometer AccelerometerSensor;
-        Gyroscope GyroscopeSensor;
-        Emg EmgSensor;
+        MulticlassSupportVectorMachineClassifier Classifier;
 
-        DecisionTreeClassifier Classifier;
-
-        DataInFeatureOut AllFeatures, GryoFeatures, EMGFeatures;
+        DataInFeatureOut AllFeatures;
         FeaturesInDecisionOut Decision;
+
+        Myo MyoVirtualSensor;
 
         public MyoGym1(string mqttURL)
         {
@@ -36,66 +35,15 @@ namespace ContestManager.Modules.HGR
             {
                 "/i5/myo/full"
             };
+            MyoVirtualSensor = new Myo(mqttURL);
 
         }
 
         public void PreConfig()
         {
-            Classifier = new DecisionTreeClassifier(FusionFramework.Classifiers.DecisionTreeLearningAlgorithms.C45Learning);
-            Classifier.Load("LDAMyoGYM");
-            AllFeatures = new DataInFeatureOut(new MQTTReader<double[]>("/i5/myo/full"), new IFeature[]{
-                new HjorthParameters(10, 11, 12),
-                        new StandardDeviation(10, 11, 12),
-                        new Mean(10, 11, 12),
-                        new Min(10, 11, 12),
-                        new Max(10, 11, 12),
-                        new Percentile(5,  10, 11, 12),
-                        new Percentile(10, 10, 11, 12),
-                        new Percentile(25, 10, 11, 12),
-                        new Percentile(50, 10, 11, 12),
-                        new Percentile(75, 10, 11, 12),
-                        new Percentile(90, 10, 11, 12),
-                        new Percentile(95, 10, 11, 12),
-                        new ZeroCrossing(10, 11, 12),
-                        new MeanCrossing(10, 11, 12),
-                        new Entropy(11, 12, 13),
-                        new Correlation(10, 11),
-                        new Correlation(10, 12),
-                        new Correlation(11, 12),
-
-                        new HjorthParameters(14, 15, 16),
-                        new StandardDeviation(14, 15, 16),
-                        new Mean(14, 15, 16),
-                        new Min(14, 15, 16),
-                        new Max(14, 15, 16),
-                        new Percentile(5,  14, 15, 16),
-                        new Percentile(10, 14, 15, 16),
-                        new Percentile(25, 14, 15, 16),
-                        new Percentile(50, 14, 15, 16),
-                        new Percentile(75, 14, 15, 16),
-                        new Percentile(90, 14, 15, 16),
-                        new Percentile(95, 14, 15, 16),
-                        new ZeroCrossing(14, 15, 16),
-                        new MeanCrossing(14, 15, 16),
-                        new Entropy(14, 15, 16),
-
-                        new StandardDeviation(1,2,3,4,5,6,7,8),
-                        new Mean(1,2,3,4,5,6,7,8 ),
-                        new Min(1,2,3,4,5,6,7,8 ),
-                        new Max(1,2,3,4,5,6,7,8 ),
-                        new Median(1,2,3,4,5,6,7,8 ),
-                        new Percentile(5, 1,2,3,4,5,6,7,8 ),
-                        new Percentile(10, 1,2,3,4,5,6,7,8 ),
-                        new Percentile(25,  1,2,3,4,5,6,7,8 ),
-                        new Percentile(50, 1,2,3,4,5,6,7,8 ),
-                        new Percentile(75, 1,2,3,4,5,6,7,8 ),
-                        new Percentile(90, 1,2,3,4,5,6,7,8 ),
-                        new Percentile(95, 1,2,3,4,5,6,7,8 ),
-
-                        new SumLargerThan(25, 1,2,3,4,5,6,7,8 ),
-                        new SumLargerThan(50, 1,2,3,4,5,6,7,8 ),
-                        new SumLargerThan(100, 1,2,3,4,5,6,7,8 ),
-            });
+            Classifier = new MulticlassSupportVectorMachineClassifier();
+            Classifier.Load("Modules/HGR/MyoGym_SVM");
+            AllFeatures = new DataInFeatureOut(MyoVirtualSensor.GetConfiguration().Reader, MyoVirtualSensor.GetConfiguration().Features);
             Decision = new FeaturesInDecisionOut(new List<IFusionStrategy>() { AllFeatures }, Classifier);
 
         }

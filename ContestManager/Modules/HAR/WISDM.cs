@@ -32,27 +32,6 @@ namespace ContestManager.Modules.HAR
         }
     }
 
-    class PreProcessData : IDataTransformer
-    {
-        public override void Transform(ref List<double[]> data)
-        {
-            var TimeStamps = data.ToArray().GetColumn<double>(0);
-            data = new List<double[]>(data.ToArray().RemoveColumn<double>(0));
-            new Normalize().Transform(ref data);
-            data =  new List<double[]>(Matrix.InsertColumn<double, double>(data.ToArray(), TimeStamps, 0));
-        }
-
-        public override void Transform(ref List<double> data)
-        {
-            
-        }
-
-        public override void Transform(ref List<int> data)
-        {
-            
-        }
-    }
-
     class WISDM : IModule
     {
         DecisionTreeClassifier Classifier;
@@ -73,13 +52,18 @@ namespace ContestManager.Modules.HAR
 
         public WISDM(string mqttURL)
         {
-            AccelerometerSensor = new Accelerometer(mqttURL, 200, 25, new IFeature[] {
-                new Mean(1, 2, 3),
-                new StandardDeviation(1, 2, 3),
-                new MeanAbsoluteDeviation(1, 2, 3),
-                new AverageTimeBetweenPeaks(0, 1, 2, 3),
+            AccelerometerSensor = new Accelerometer(mqttURL, 200, 0, new IFeature[] {
+                new Mean(),
+                new StandardDeviation(),
+                new MeanAbsoluteDeviation(),
                 new ResultantAcceleration(),
-                new BinDistribution(10, 1, 2, 3)
+                new BinDistribution(10),
+                new Variance(),
+                new Median(),
+                new Range(),
+                new Min(),
+                new Max(),
+                new RootMeanSquare()
             });
             RequiredSensors = new List<string>()
             {
@@ -91,9 +75,8 @@ namespace ContestManager.Modules.HAR
         public void PreConfig()
         {
             Classifier = new DecisionTreeClassifier(FusionFramework.Classifiers.DecisionTreeLearningAlgorithms.C45Learning);
-            Classifier.Load("DecisionTreeWSDM");
+            Classifier.Load("Modules/HAR/WisdnDT");
             Feature1 = new DataInFeatureOut(AccelerometerSensor.GetConfiguration().Reader, AccelerometerSensor.GetConfiguration().Features);
-            Feature1.Add(new PreProcessData());
             Decision = new FeaturesInDecisionOut(new List<IFusionStrategy>() { Feature1 }, Classifier);
 
         }
@@ -133,7 +116,7 @@ namespace ContestManager.Modules.HAR
             featureManager.Add(new AverageTimeBetweenPeaks(0, 1, 2, 3));
             featureManager.Add(new ResultantAcceleration());
             featureManager.Add(new BinDistribution(10, 1, 2, 3));
-            featureManager.Add(new PreProcessData());
+            //featureManager.Add(new PreProcessData());
 
             var dataReader = new CSVReader<double[]>("data.txt", false, (dynamic output) =>
             {

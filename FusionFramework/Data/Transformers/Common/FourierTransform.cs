@@ -13,7 +13,7 @@ namespace FusionFramework.Data.Transformers.Common
     /// <summary>
     /// Fourier Transform
     /// </summary>
-    public class FourierTransform
+    public class FourierTransform : IDataTransformer
     {
 
         /// <summary>
@@ -34,6 +34,21 @@ namespace FusionFramework.Data.Transformers.Common
             }
             Accord.Math.FourierTransform.FFT2(ComplexMatrix, Accord.Math.FourierTransform.Direction.Forward);
             return ComplexMatrix;
+        }
+
+        public override void Transform(ref List<double[]> data)
+        {
+            
+        }
+
+        public override void Transform(ref List<double> data)
+        {
+
+        }
+
+        public override void Transform(ref List<int> data)
+        {
+
         }
 
         /// <summary>

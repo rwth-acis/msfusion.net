@@ -89,8 +89,6 @@ namespace FusionFramework.Core.Data.Reader
         {
             try
             {
-                var s = System.Text.Encoding.UTF8.GetString(e.Message);
-
                 if (Segmentator.Push((T)Convert.ChangeType(Array.ConvertAll(System.Text.Encoding.UTF8.GetString(e.Message).Split(','), double.Parse), typeof(T))) == true)
                 {
                     OnReadFinished(Segmentator.Window);
@@ -135,6 +133,8 @@ namespace FusionFramework.Core.Data.Reader
         public void Add(SlidingWindow<T> slidingWindow)
         {
             Segmentator = slidingWindow;
+            Client.MqttMsgPublishReceived -= MessageArrivedCallback;
+            Client.MqttMsgPublishReceived += MessageArrivedSegmentedCallback;
         }
     }
 }

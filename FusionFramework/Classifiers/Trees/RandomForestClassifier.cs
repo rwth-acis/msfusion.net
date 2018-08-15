@@ -33,7 +33,7 @@ namespace FusionFramework.Classifiers.Trees
         /// Instantiate Classifier.
         /// </summary>
         /// <param name="numTrees">Maximum number of trees.</param>
-        RandomForestClassifier(int numTrees)
+        public RandomForestClassifier(int numTrees)
         {
             NumTrees = numTrees;
         }
@@ -43,7 +43,7 @@ namespace FusionFramework.Classifiers.Trees
         /// </summary>
         /// <param name="numTrees">Maximum number of trees.</param>
         /// <param name="samplePropotion">Sample propotion.</param>
-        RandomForestClassifier(int numTrees, double samplePropotion)
+        public RandomForestClassifier(int numTrees, double samplePropotion)
         {
             SamplePropotion = samplePropotion;
         }
@@ -76,13 +76,11 @@ namespace FusionFramework.Classifiers.Trees
             {
                 LearningAlgorithm.SampleRatio = SamplePropotion;
             }
-            int[][] TrainingData = TypeCasters.DoubleMultiArrayToInt(trainingData).ToArray();
-            int[] TrainingLabels = TypeCasters.DoubleArrayToInt(trainingLabels).ToArray();
 
-            Model = LearningAlgorithm.Learn(TrainingData, TrainingLabels);
+            Model = LearningAlgorithm.Learn(trainingData.ToArray(), trainingLabels.ToArray());
             if(calculateError == true)
             {
-                TrainingError = new ZeroOneLoss(TrainingLabels).Loss(Model.Decide(TrainingData));
+                TrainingError = new ZeroOneLoss(trainingLabels.ToArray()).Loss(Model.Decide(trainingData.ToArray()));
             }
         }
 
