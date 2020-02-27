@@ -1,16 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContestManager", "ContestManager\ContestManager.csproj", "{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999} = {EBF4F89C-B1E1-4222-B914-C1B734B5A999}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARLEMDecipher", "..\ARLEMDecipher\ARLEMDecipher\ARLEMDecipher.csproj", "{ACA75398-7DFA-4EE4-ABA9-25EE0B15D87B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FusionFramework", "FusionFramework\FusionFramework.csproj", "{EBF4F89C-B1E1-4222-B914-C1B734B5A999}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContextManager", "ContextManager\ContextManager.csproj", "{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARLEMDecipher", "ARLEMDecipher\ARLEMDecipher.csproj", "{ACA75398-7DFA-4EE4-ABA9-25EE0B15D87B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +21,22 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|ARM.Build.0 = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x64.Build.0 = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x86.Build.0 = Debug|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|ARM.ActiveCfg = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|ARM.Build.0 = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x64.ActiveCfg = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x64.Build.0 = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x86.ActiveCfg = Release|Any CPU
+		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x86.Build.0 = Release|Any CPU
 		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E77A270-56B9-4AFD-9C7B-30D255F24FAF}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -56,22 +69,6 @@ Global
 		{ACA75398-7DFA-4EE4-ABA9-25EE0B15D87B}.Release|x64.Build.0 = Release|Any CPU
 		{ACA75398-7DFA-4EE4-ABA9-25EE0B15D87B}.Release|x86.ActiveCfg = Release|Any CPU
 		{ACA75398-7DFA-4EE4-ABA9-25EE0B15D87B}.Release|x86.Build.0 = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|ARM.Build.0 = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x64.Build.0 = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Debug|x86.Build.0 = Debug|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|ARM.ActiveCfg = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|ARM.Build.0 = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x64.ActiveCfg = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x64.Build.0 = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x86.ActiveCfg = Release|Any CPU
-		{EBF4F89C-B1E1-4222-B914-C1B734B5A999}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
