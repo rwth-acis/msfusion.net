@@ -1,26 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Accord.Math;
 
 namespace FusionFramework.Features.Complex
 {
-    class AverageTimeBetweenPeaks : IFeature
+    public class AverageTimeBetweenPeaks : IFeature
     {
-        int PeakIndex;
-        public AverageTimeBetweenPeaks(int index)
+        double[] TimeStamps;
+        int TimeIndex;
+
+        public AverageTimeBetweenPeaks(int timeIndex)
         {
-            PeakIndex = index;
+            Flavour = FeatureFlavour.MatrixInVectorOut;
+            TimeIndex = timeIndex;
+        }
+
+        public AverageTimeBetweenPeaks(int timeIndex, params int[] useColumns)
+        {
+            Flavour = FeatureFlavour.MatrixInVectorOut;
+            UseColumns = useColumns;
+            TimeIndex = timeIndex;
         }
 
         public override dynamic Calculate(dynamic data)
         {
-            int[] Peaks = Accord.Audio.Tools.FindPeaks(data);
-            double[] differece = new double[Peaks.Length];
-            for (int p = 1; p < Peaks.Length; p++)
+            double[][] Array = data;
+            TimeStamps = Array.GetColumn<double>(TimeIndex);
+            List<double> Output = new List<double>();
+
+            foreach (var col in UseColumns)
             {
-                differece[p] = data[p] - data[p - 1];
+                Output.Add(Calculate(Array.GetColumn<double>(col)));
             }
-            return Accord.Statistics.Measures.Mean(differece);
+            return Output;
+        }
+
+        private double Calculate(double[] data)
+        {
+            int[] Peaks = Accord.Audio.Tools.FindPeaks(data);
+            List<double> differece = new List<double>();
+            foreach (var col in Peaks)
+            {
+                if (col != 0)
+                    differece.Add(TimeStamps[col] - TimeStamps[col - 1]);
+            }
+            return Accord.Statistics.Measures.Mean(differece.ToArray());
         }
     }
 }

@@ -3,13 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
+/// <summary>
+/// Common Transformers
+/// </summary>
 namespace FusionFramework.Data.Transformers.Common
 {
     // TODO: Improve FFT implementation
 
-    class FourierTransform
+    /// <summary>
+    /// Fourier Transform
+    /// </summary>
+    public class FourierTransform : IDataTransformer
     {
-        public Complex[,] Transform(ref List<double[]> data)
+
+        /// <summary>
+        /// Transform time domain signal to frequency domain signal.
+        /// </summary>
+        /// <param name="data">Signal to be transformed.</param>
+        /// <returns></returns>
+        public Complex[,] Transform(List<double[]> data)
         {
             Complex[][] ComplexArray = data.ConvertAll<Complex[]>(new Converter<double[], Complex[]>(DoubleToComplex)).ToArray();
             Complex[,] ComplexMatrix = new Complex[ComplexArray.GetLength(0), ComplexArray.GetLength(1)];
@@ -24,6 +36,26 @@ namespace FusionFramework.Data.Transformers.Common
             return ComplexMatrix;
         }
 
+        public override void Transform(ref List<double[]> data)
+        {
+            
+        }
+
+        public override void Transform(ref List<double> data)
+        {
+
+        }
+
+        public override void Transform(ref List<int> data)
+        {
+
+        }
+
+        /// <summary>
+        /// Type casting from double vector to complex vector.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private Complex[] DoubleToComplex(double[] input)
         {
             return Accord.Math.ComplexMatrix.ToComplex(input);

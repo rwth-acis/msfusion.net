@@ -6,11 +6,20 @@ using System.Linq;
 
 namespace FusionFramework.Features.Complex
 {
-    class BinDistribution : IFeature
+    public class BinDistribution : IFeature
     {
         int BinCount;
         public BinDistribution(int binCount)
         {
+            Flavour = FeatureFlavour.VectorInVectorOut;
+            ReturnsArray = true;
+            BinCount = binCount;
+        }
+        public BinDistribution(int binCount, params int[] useColumns)
+        {
+            Flavour = FeatureFlavour.VectorInVectorOut;
+            ReturnsArray = true;
+            UseColumns = useColumns;
             BinCount = binCount;
         }
 

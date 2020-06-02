@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Magnitude : IFeature
+    public class Magnitude : IFeature
     {
+        public Magnitude()
+        {
+
+        }
+
+        public Magnitude(params int[] columns)
+        {
+            UseColumns = columns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             return Accord.Math.Norm.Euclidean(data);

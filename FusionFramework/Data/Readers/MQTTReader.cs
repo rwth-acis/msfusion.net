@@ -1,25 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 using FusionFramework.Core.Utilities;
-using static uPLibrary.Networking.M2Mqtt.MqttClient;
-using FusionFramework.Transformer.Data;
 using FusionFramework.Data.Segmentators;
 
 namespace FusionFramework.Core.Data.Reader
 {
-    class MQTTReader : IReader
+    /// <summary>
+    /// Reads stream using MQTT protocol.
+    /// </summary>
+    public class MQTTReader<T> : IReader
     {
         private MqttClient Client;
-        private String UUID = "cc36fa72-2af8-4161-9004-a73a0d69aed7";
-        
 
+        /// <summary>
+        /// Segmentation if required by client for the incoming data.
+        /// </summary>
+        public SlidingWindow<T> Segmentator;
+
+
+        /// <summary>
+        /// Instantiate the MQTT reader without segmentator.
+        /// </summary>
+        /// <param name="subscriberURL">MQTT topic address</param>
+        public MQTTReader(string subscriberURL)
+        {
+            Client = new MqttClient("iot.eclipse.org");
+            Client.Connect(Guid.NewGuid().ToString());
+
+            Client.MqttMsgPublishReceived += MessageArrivedCallback;
+            Path = subscriberURL;
+        }
+
+        /// <summary>
+        /// Instantiate the MQTT reader without segmentator.
+        /// </summary>
+        /// <param name="subscriberURL">MQTT topic address</param>
+        /// <param name="onReadFinished">Trigger when reading finished.</param>
         public MQTTReader(string subscriberURL, ReadFinished onReadFinished)
         {
-            Client = new MqttClient("cloud11.dbis.rwth-aachen.de");
+            Client = new MqttClient("iot.eclipse.org");
             Client.Connect(Guid.NewGuid().ToString());
 
             Client.MqttMsgPublishReceived += MessageArrivedCallback;
@@ -27,39 +48,77 @@ namespace FusionFramework.Core.Data.Reader
             Path = subscriberURL;
         }
 
-        public MQTTReader(string subscriberURL, ReadFinished onReadFinished, ISegmentator segmentator)
+        /// <summary>
+        /// Instantiate the MQTT reader with segmentator.
+        /// </summary>
+        /// <param name="subscriberURL">MQTT topic address</param>
+        /// <param name="segmentator">Segmentation class that breaks the file in segementation / windows</param>
+        public MQTTReader(string subscriberURL, SlidingWindow<T> segmentator)
         {
-            Client = new MqttClient("cloud11.dbis.rwth-aachen.de");
+            Client = new MqttClient("iot.eclipse.org");
             Client.Connect(Guid.NewGuid().ToString());
 
             Client.MqttMsgPublishReceived += MessageArrivedSegmentedCallback;
+
             Segmentator = segmentator;
             Path = subscriberURL;
         }
 
+        /// <summary>
+        /// Start Reading
+        /// </summary>
         public override void Start()
         {
             Client.Subscribe(new string[] { Path }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
         }
 
+        /// <summary>
+        /// Stop Reading
+        /// </summary>
+        public override void Stop()
+        {
+            Client.Unsubscribe(new string[] { Path });
+        }
+
+        /// <summary>
+        /// Triggers when message is recieved from MQTT server and perform segmentation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MessageArrivedSegmentedCallback(object sender, MqttMsgPublishEventArgs e)
         {
-            if (Segmentator.Push(Array.ConvertAll(e.Message.ToString().Split(','), double.Parse)) == true)
+            try
             {
-                OnReadFinished(Segmentator.Window);
+                if (Segmentator.Push((T)Convert.ChangeType(Array.ConvertAll(System.Text.Encoding.UTF8.GetString(e.Message).Split(','), double.Parse), typeof(T))) == true)
+                {
+                    OnReadFinished(Segmentator.Window);
+                }
+
+            }
+            catch (System.FormatException)
+            {
+
             }
         }
 
+        /// <summary>
+        /// Triggers when message is recieved from MQTT server.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MessageArrivedCallback(object sender, MqttMsgPublishEventArgs e)
         {
-            OnReadFinished(Array.ConvertAll(e.Message.ToString().Split(','), double.Parse));
+            OnReadFinished(Array.ConvertAll(System.Text.Encoding.UTF8.GetString(e.Message).Split(','), double.Parse));
         }
 
+        /// <summary>
+        /// Test connection with server.
+        /// </summary>
         public static void TestConnection()
         {
             try
             {
-                MqttClient mqttClient = new MqttClient("cloud11.dbis.rwth-aachen.de");
+                MqttClient mqttClient = new MqttClient("iot.eclipse.org");
                 mqttClient.Connect(Guid.NewGuid().ToString());
                 mqttClient.Disconnect();
             }
@@ -69,6 +128,13 @@ namespace FusionFramework.Core.Data.Reader
                 // TODO: Terminate app
             }
 
-        }        
+        }
+
+        public void Add(SlidingWindow<T> slidingWindow)
+        {
+            Segmentator = slidingWindow;
+            Client.MqttMsgPublishReceived -= MessageArrivedCallback;
+            Client.MqttMsgPublishReceived += MessageArrivedSegmentedCallback;
+        }
     }
 }

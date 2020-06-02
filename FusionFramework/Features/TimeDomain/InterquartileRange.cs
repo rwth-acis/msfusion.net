@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class InterquartileRange : IFeature
+    public class InterquartileRange : IFeature
     {
+        public InterquartileRange()
+        {
+
+        }
+
+        public InterquartileRange(params int[] columns)
+        {
+            UseColumns = columns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             return Accord.Statistics.Measures.UpperQuartile(data) - Accord.Statistics.Measures.LowerQuartile(data);

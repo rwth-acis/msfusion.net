@@ -1,14 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
 
 namespace FusionFramework.Features.TimeDomain
 {
-    class Sum : IFeature
+    public class Sum : IFeature
     {
+        public Sum()
+        {
+
+        }
+        public Sum(params int[] useColumns)
+        {
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
-            return data.Sum();
+            return ((double[])data).Sum();
         }
     }
 }

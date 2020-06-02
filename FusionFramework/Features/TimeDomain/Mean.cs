@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using System.Linq;
 namespace FusionFramework.Features.TimeDomain
 {
-    class Mean : IFeature
+    public class Mean : IFeature
     {
+        public Mean()
+        {
+            Flavour = FeatureFlavour.VectorInValueOut;
+        }
+        public Mean(params int[] useColumns)
+        {
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
-            return Accord.Statistics.Circular.Mean(data);
+            return Accord.Statistics.Measures.Mean(data);
         }
     }
 }

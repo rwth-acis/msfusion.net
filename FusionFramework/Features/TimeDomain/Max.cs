@@ -1,14 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
 
 namespace FusionFramework.Features.TimeDomain
 {
-    class Max : IFeature
+    public class Max : IFeature
     {
+        public Max()
+        {
+        }
+
+        public Max(params int[] useColumns)
+        {
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
-            return data.Max();
+            return ((double[]) data).Max();
         }
     }
 }

@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Variance : IFeature
+    public class Variance : IFeature
     {
+        public Variance()
+        {
+
+        }
+        public Variance(params int[] useColumns)
+        {
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             return Accord.Statistics.Measures.Variance(data);

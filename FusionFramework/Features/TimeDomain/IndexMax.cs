@@ -1,15 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace FusionFramework.Features.TimeDomain
 {
-    class IndexMax : IFeature
+    public class IndexMax : IFeature
     {
+        public IndexMax()
+        {
+
+        }
+        public IndexMax(params int[] useColumns)
+        {
+            UseColumns = useColumns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
-            return Array.IndexOf(data, data.Max());
+            var DoubleData = ((double[])data);
+            return Array.IndexOf(DoubleData, DoubleData.Max());
         }
     }
 }

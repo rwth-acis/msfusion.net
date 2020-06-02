@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>rizalishan</authors>
+    <owners>rizalishan</owners>
+    <licenseUrl>https://github.com/rwth-acis/ARLEMDecipher</licenseUrl>
+    <projectUrl>https://github.com/rwth-acis/ARLEMDecipher</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>An ARLEM Document parser (currently Only JSON).</description>
+    <copyright>Copyright 2018</copyright>
+  </metadata>
+</package>

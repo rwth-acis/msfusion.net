@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Percentile : IFeature
+    public class Percentile : IFeature
     {
         int Percentage;
 
         public Percentile(int percentile)
         {
             Percentage = percentile;
+        }
+
+        public Percentile(int percentile, params int[] useColumns)
+        {
+            UseColumns = useColumns;
         }
 
         public override dynamic Calculate(dynamic data)

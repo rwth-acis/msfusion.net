@@ -134,6 +134,8 @@ DocProject/Help/*.hhk
 DocProject/Help/*.hhp
 DocProject/Help/Html2
 DocProject/Help/html
+FusionFramework/_site
+ContestManager/_site
 
 # Click-Once directory
 publish/
@@ -259,3 +261,5 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# custom

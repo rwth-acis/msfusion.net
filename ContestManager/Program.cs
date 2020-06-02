@@ -1,22 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-using Accord.MachineLearning.DecisionTrees;
-using Accord.MachineLearning.DecisionTrees.Learning;
-using ARLEMDecipher.Models.Workplaces.Sensors;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
 using Microsoft.ML.Transforms;
 using numl.Model;
 using numl.Supervised.DecisionTree;
+using ContestManager.Modules;
+using ContestManager.Modules.HAR;
+using ContestManager.Modules.HGR;
+using ARLEMDecipher;
+using System.Linq;
+using FusionFramework.Core.Data.Reader;
+using FusionFramework.Classifiers.Trees;
+using FusionFramework.Features;
+using FusionFramework.Features.Complex;
+using FusionFramework.Features.TimeDomain;
+using FusionFramework.Data.Segmentators;
+using FusionFramework.Classifiers.VectorMachines;
+using FusionFramework.Fusion.Strategies;
+using System.Threading.Tasks;
+using uPLibrary.Networking.M2Mqtt;
+using System.Text;
 
 namespace ContestManager
 {
+    class ResultantAcceleration : FusionFramework.Features.IFeature
+    {
+        public ResultantAcceleration()
+        {
+            Flavour = FeatureFlavour.MatrixInValueOut;
+        }
+
+        public override dynamic Calculate(dynamic data)
+        {
+            double[][] Array = data;
+            return new Mean().Calculate(Array.Select(x => (double)new Magnitude().Calculate(x)).ToArray<double>());
+        }
+    }
+
     class Program
     {
 
@@ -24,328 +46,451 @@ namespace ContestManager
         // var logisticRegressionClassifier;
         // var adaBoostClassifier;
 
+        static void TrainModules()
+        {
+            //var WISDMO = new WISDM("/i5/mobileMotion/accelerometer");
+            //WISDMO.Train();
 
+            var MyoGymO = new MyoGym("/i5/myo/accelerometer", "/i5/myo/gyroscope", "/i5/myo/emg");
+            MyoGymO.TrainFromFeatures();
+
+        }
+        static void MyoGym_no_acc()
+        {
+            FeatureManager featureManager = new FeatureManager();
+            var Classifier = new MulticlassSupportVectorMachineClassifier();
+            Classifier.Load("C:\\Users\\riz\\Desktop\\MyoGYm\\MyoGym_NOEMG_SVM");
+            var dataReader = new MQTTReader<double[]>("/i5/myo/full", (dynamic output) =>
+            {
+                var FeaturSpace = FeatureManager.Generate(output, new List<IFeature>()
+                    {
+                        new HjorthParameters(0,1,2),
+                        new StandardDeviation(0,1,2),
+                        new Mean(0,1,2),
+                        new Max(0,1,2),
+                        new Min(0,1,2),
+                        new Percentile(5,  0,1,2),
+                        new Percentile(10, 0,1,2),
+                        new Percentile(25, 0,1,2),
+                        new Percentile(50, 0,1,2),
+                        new Percentile(75, 0,1,2),
+                        new Percentile(90, 0,1,2),
+                        new Percentile(95, 0,1,2),
+                        new ZeroCrossing(0,1,2),
+                        new MeanCrossing(0,1,2),
+                        new Entropy(0,1,2),
+                        new Correlation(0, 1),
+                        new Correlation(0, 2),
+                        new Correlation(1, 2),
+
+                        new HjorthParameters(3,4,5),
+                        new StandardDeviation(3,4,5),
+                        new Mean(3,4,5),
+                        new Max(3,4,5),
+                        new Min(3,4,5),
+                        new Percentile(5,  3,4,5),
+                        new Percentile(10, 3,4,5),
+                        new Percentile(25, 3,4,5),
+                        new Percentile(50, 3,4,5),
+                        new Percentile(75, 3,4,5),
+                        new Percentile(90, 3,4,5),
+                        new Percentile(95, 3,4,5),
+                        new ZeroCrossing(3,4,5),
+                        new MeanCrossing(3,4,5),
+                        new Entropy(3,4,5)
+
+                    });
+
+                Console.WriteLine(Classifier.Classify(FeaturSpace));
+
+            });
+            dataReader.Add(new SlidingWindow<double[]>(200, 0));
+            dataReader.Start();
+
+
+        }
+
+        static void MyoGym()
+        {
+            FeatureManager featureManager = new FeatureManager();
+            var Classifier = new MulticlassSupportVectorMachineClassifier();
+            Classifier.Load("C:\\Users\\riz\\Desktop\\MyoGYm\\MyoGym_SVM");
+            var dataReader = new MQTTReader<double[]>("/i5/myo/full", (dynamic output) =>
+            {
+                var FeaturSpace = FeatureManager.Generate(output, new List<IFeature>()
+                    {
+                        new HjorthParameters(8,9,10),
+                        new StandardDeviation(8,9,10),
+                        new Mean(8,9,10),
+                        new Max(8,9,10),
+                        new Min(8,9,10),
+                        new Percentile(5,  8,9,10),
+                        new Percentile(10, 8,9,10),
+                        new Percentile(25, 8,9,10),
+                        new Percentile(50, 8,9,10),
+                        new Percentile(75, 8,9,10),
+                        new Percentile(90, 8,9,10),
+                        new Percentile(95, 8,9,10),
+                        new ZeroCrossing(8,9,10),
+                        new MeanCrossing(8,9,10),
+                        new Entropy(8, 9, 10),
+                        new Correlation(9, 10),
+                        new Correlation(9, 11),
+                        new Correlation(10, 11),
+
+                        new HjorthParameters(11,12,13),
+                        new StandardDeviation(11,12,13),
+                        new Mean(11,12,13),
+                        new Max(11,12,13),
+                        new Min(11,12,13),
+                        new Percentile(5,  11,12,13),
+                        new Percentile(10, 11,12,13),
+                        new Percentile(25, 11,12,13),
+                        new Percentile(50, 11,12,13),
+                        new Percentile(75, 11,12,13),
+                        new Percentile(90, 11,12,13),
+                        new Percentile(95, 11,12,13),
+                        new ZeroCrossing(11,12,13),
+                        new MeanCrossing(11,12,13),
+                        new Entropy(11,12,13),
+
+                        new StandardDeviation(0,1,2,3,4,5,6,7),
+                        new Mean(0,1,2,3,4,5,6,7 ),
+                        new Max(0,1,2,3,4,5,6,7 ),
+                        new Min(0,1,2,3,4,5,6,7 ),
+                        new Percentile(5, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(10, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(25,  0,1,2,3,4,5,6,7 ),
+                        new Percentile(50, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(75, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(90, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(95, 0,1,2,3,4,5,6,7 ),
+
+                        new SumLargerThan(25, 0,1,2,3,4,5,6,7 ),
+                        new SumLargerThan(50, 0,1,2,3,4,5,6,7 ),
+                        new SumLargerThan(100, 0,1,2,3,4,5,6,7 )
+
+                    });
+
+                Console.WriteLine("HGR(" + Classifier.Classify(FeaturSpace) + ")");
+
+            });
+            dataReader.Add(new SlidingWindow<double[]>(200, 0));
+            dataReader.Start();
+
+
+        }
+
+        static void MyoGymFusion()
+        {
+            var Classifier = new MulticlassSupportVectorMachineClassifier();
+            Classifier.Load("C:\\Users\\riz\\Desktop\\MyoGYm\\MyoGym_SVM1");
+            var Features = new DataInFeatureOut(new MQTTReader<double[]>("/i5/myo/full", new SlidingWindow<double[]>(200, 0)), new IFeature[] {
+                new HjorthParameters(8,9,10),
+                        new StandardDeviation(8,9,10),
+                        new Mean(8,9,10),
+                        new Max(8,9,10),
+                        new Min(8,9,10),
+                        new Percentile(5,  8,9,10),
+                        new Percentile(10, 8,9,10),
+                        new Percentile(25, 8,9,10),
+                        new Percentile(50, 8,9,10),
+                        new Percentile(75, 8,9,10),
+                        new Percentile(90, 8,9,10),
+                        new Percentile(95, 8,9,10),
+                        new ZeroCrossing(8,9,10),
+                        new MeanCrossing(8,9,10),
+                        new Entropy(8, 9, 10),
+                        new Correlation(9, 10),
+                        new Correlation(9, 11),
+                        new Correlation(10, 11),
+
+                        new HjorthParameters(11,12,13),
+                        new StandardDeviation(11,12,13),
+                        new Mean(11,12,13),
+                        new Max(11,12,13),
+                        new Min(11,12,13),
+                        new Percentile(5,  11,12,13),
+                        new Percentile(10, 11,12,13),
+                        new Percentile(25, 11,12,13),
+                        new Percentile(50, 11,12,13),
+                        new Percentile(75, 11,12,13),
+                        new Percentile(90, 11,12,13),
+                        new Percentile(95, 11,12,13),
+                        new ZeroCrossing(11,12,13),
+                        new MeanCrossing(11,12,13),
+                        new Entropy(11,12,13),
+
+                        new StandardDeviation(0,1,2,3,4,5,6,7),
+                        new Mean(0,1,2,3,4,5,6,7 ),
+                        new Max(0,1,2,3,4,5,6,7 ),
+                        new Min(0,1,2,3,4,5,6,7 ),
+                        new Percentile(5, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(10, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(25,  0,1,2,3,4,5,6,7 ),
+                        new Percentile(50, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(75, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(90, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(95, 0,1,2,3,4,5,6,7 ),
+
+                        new SumLargerThan(25, 0,1,2,3,4,5,6,7 ),
+                        new SumLargerThan(50, 0,1,2,3,4,5,6,7 ),
+                        new SumLargerThan(100, 0,1,2,3,4,5,6,7 )
+
+
+            });
+            var Decision = new FeaturesInDecisionOut(new List<IFusionStrategy>() { Features }, Classifier);
+            Decision.OnFusionFinished = (decision) =>
+            {
+                Console.WriteLine(decision);
+            };
+
+            Features.Start();
+
+        }
+
+        MulticlassSupportVectorMachineClassifier svmClassifier;
+
+        static void Cmacc_mqtt()
+        {
+            FeatureManager featureManager = new FeatureManager();
+            var Classifier = new DecisionTreeClassifier(FusionFramework.Classifiers.DecisionTreeLearningAlgorithms.C45Learning);
+            Classifier.Load("C:\\Users\\riz\\Desktop\\WISDM\\WisdnDT");
+            var dataReader = new MQTTReader<double[]>("/i5/mobileMotion/accelerometer", (dynamic output) =>
+            {
+                var FeaturSpace = FeatureManager.Generate(output, new List<IFeature>()
+                    {
+                        new Mean(),
+                        new StandardDeviation(),
+                        new MeanAbsoluteDeviation(),
+                        new ResultantAcceleration(),
+                        new BinDistribution(10),
+
+                        new Variance(),
+                        new Median(),
+                        new Range(),
+                        new Min(),
+                        new Max(),
+                        new RootMeanSquare()
+
+                    });
+
+                Console.WriteLine("HAR(" + Classifier.Classify(FeaturSpace) + ")");
+
+            });
+            dataReader.Add(new SlidingWindow<double[]>(200, 0));
+            dataReader.Start();
+
+
+        }
+
+        static void CMacc()
+        {
+            FeatureManager featureManager = new FeatureManager();
+            var Classifier = new DecisionTreeClassifier(FusionFramework.Classifiers.DecisionTreeLearningAlgorithms.C45Learning);
+            Classifier.Load("C:\\Users\\riz\\Desktop\\MyoGymDT");
+            var dataReader = new MQTTReader<double[]>("/i5/myo/full", (dynamic output) =>
+            {
+                var FeaturSpace = FeatureManager.Generate(output, new List<IFeature>()
+                    {
+                        new HjorthParameters(8,9,10),
+                        new StandardDeviation(8,9,10),
+                        new Mean(8,9,10),
+                        new Max(8,9,10),
+                        new Min(8,9,10),
+                        new Percentile(5,  8,9,10),
+                        new Percentile(10, 8,9,10),
+                        new Percentile(25, 8,9,10),
+                        new Percentile(50, 8,9,10),
+                        new Percentile(75, 8,9,10),
+                        new Percentile(90, 8,9,10),
+                        new Percentile(95, 8,9,10),
+                        new ZeroCrossing(8,9,10),
+                        new MeanCrossing(8,9,10),
+                        new Entropy(9, 10, 11),
+                        new Correlation(9, 10),
+                        new Correlation(9, 11),
+                        new Correlation(10, 11),
+
+                        new HjorthParameters(11,12,13),
+                        new StandardDeviation(11,12,13),
+                        new Mean(11,12,13),
+                        new Max(11,12,13),
+                        new Min(11,12,13),
+                        new Percentile(5,  11,12,13),
+                        new Percentile(10, 11,12,13),
+                        new Percentile(25, 11,12,13),
+                        new Percentile(50, 11,12,13),
+                        new Percentile(75, 11,12,13),
+                        new Percentile(90, 11,12,13),
+                        new Percentile(95, 11,12,13),
+                        new ZeroCrossing(11,12,13),
+                        new MeanCrossing(11,12,13),
+                        new Entropy(11,12,13),
+
+                        new StandardDeviation(0,1,2,3,4,5,6,7),
+                        new Mean(0,1,2,3,4,5,6,7 ),
+                        new Max(0,1,2,3,4,5,6,7 ),
+                        new Min(0,1,2,3,4,5,6,7 ),
+                        new Percentile(5, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(10, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(25,  0,1,2,3,4,5,6,7 ),
+                        new Percentile(50, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(75, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(90, 0,1,2,3,4,5,6,7 ),
+                        new Percentile(95, 0,1,2,3,4,5,6,7 ),
+
+                        new SumLargerThan(25, 0,1,2,3,4,5,6,7 ),
+                        new SumLargerThan(50, 0,1,2,3,4,5,6,7 ),
+                        new SumLargerThan(100, 0,1,2,3,4,5,6,7 )
+
+                    });
+
+                Console.WriteLine(Classifier.Classify(FeaturSpace));
+
+            });
+            dataReader.Add(new SlidingWindow<double[]>(200, 0));
+            dataReader.Start();
+        }
 
         static void Main(string[] args)
         {
+            //Task taskA = Task.Factory.StartNew(MyoGymFusion);
+            //Task taskB = Task.Factory.StartNew(MyoGym);
+
+            //taskA.Wait();
+            //taskB.Wait();
+            //MyoGym();
+
+
+            //Cmacc_mqtt();
+            //MyoGym();
             // Step One Parse ARLEM document into object
-            ARLEMDecipher.ARLEMDecipher aRLEMDecipher = new ARLEMDecipher.ARLEMDecipher("127.0.0.1:8080");
-            aRLEMDecipher.LoadWorkplace(1);
+            Console.WriteLine("Choose your workplace");
+            int WorkplaceId = int.Parse(Console.ReadLine());
+
+            ARLEMDecipher.ARLEMDecipher aRLEMDecipher = new ARLEMDecipher.ARLEMDecipher("http://159.89.10.86:8080/api");
+            if (!aRLEMDecipher.LoadWorkplaceJSON(WorkplaceId))
+            {
+                Console.ReadKey();
+                return;
+            }
             int[] availableActivities = aRLEMDecipher.AvailableActivites();
-            if(availableActivities.Length > 0)
+            if (availableActivities.Length < 0)
             {
-                aRLEMDecipher.LoadActivity(availableActivities[0]);
+                Console.ReadKey();
+                return;
             }
+ 
+            Console.WriteLine("Please Select an activity");
+            aRLEMDecipher.Workplace.Activities.ForEach(activity => {
+                Console.WriteLine(aRLEMDecipher.Workplace.Activities.IndexOf(activity) + ": " + activity.Name);
+            });
+            int ActivityId = int.Parse(Console.ReadLine());
+            aRLEMDecipher.LoadActivityJSON(availableActivities[ActivityId]);
+            List<string> Sensors = aRLEMDecipher.AvailableSensors();
 
-            List<VirtualSensor> Sensors = aRLEMDecipher.RequiredSensor();
+            List<String> Modules = aRLEMDecipher.RequiredModules();
+            List<IModule> ModuleToExecute = new List<IModule>();
 
-            Sensors.ForEach(sensor =>
+            Dictionary<string, IModule> ModuleDictionary = new Dictionary<string, IModule>();
+
+            Modules.ForEach(moduleName =>
             {
-                // Check sensor's availibility by using mqtt client from framework
+                IModule BestFitModule = null;
+                IModule.ModuleMap[moduleName].ForEach(module =>
+                {
+                    if(module.IsCalculatable(Sensors))
+                    {
+                        BestFitModule = module;
+                    }
+                });
+                if(BestFitModule == null)
+                {
+                    Console.WriteLine(moduleName + " can't be calcualted with available sensors");
+                }
+                else
+                {
+                    ModuleDictionary[moduleName] = BestFitModule;
+                    ModuleToExecute.Add(BestFitModule);
+                }
             });
 
-            List<string> requiredModules = aRLEMDecipher.RequiredModules();
 
-            // If all sensors are available
-            requiredModules.ForEach(modules =>
+            Console.WriteLine("Activity requirs following sensors. Please connect your sensors and press any key to continue.");
+            ModuleToExecute.ForEach(module =>
             {
-                // Check and load each trained modules
+                module.RequiredSensors.ForEach(urn => Console.WriteLine(urn));
             });
 
-
-
-
-
-
-            // var virtualSensors = new VritualSensors();
-            // virtualSensors.Add(new Accelerometer("ChestMounted", {Mean(), STD()}, 52, new SlidingWindow(200, 50));
-            // virtualSensors.Add(new Accelerometer("ArmMounted", {Mean(), STD(), (double[]) => {return mean();}}, 52, new SlidingWindow(200, 50));
-
-            // var objFusionProcess = new FusionProcess();
-
-
-            // IntPtr fTask1 = objFusionProcess.Add(DataInFeatureOut(virtualSensors[0])));
-            // IntPtr fTask2 = objFusionProcess.Add(DataInFeatureOut(new MQTTReader("/path")));
-            // IntPtr fTask3 = objFusionProcess.Add(FeaturesInFeatureOut(fTask, fTask1));
-            // IntPtr fTask4 = objFusionProcess.Add(FeaturesInDecisionOut(fTask1, fTask2, randomForestClassifier));
-            // IntPtr fTask5 = objFusionProcess.Add(FeaturesInDecisionOut(fTask1, fTask2, logisticRegressionClassifier)));
-            // objFusionProcess.Add(DecisionsInDecisionOut(decision, adaBoostClassifier));
-
-            // objFusionProcess.Fuse(5000, ()=> {
-            //      // Fusion Done
-            // });
-
-
-        }
-
-
-        static void Train()
-        {
-            // randomForestClassifier = new RandomForestClassifier();
-            // randomForestClassifier.Add(new CSVReader("data.txt").AsTrainingData());
-            // randomForestClassifier.Add(new CSVReader("label.txt").AsTrainingLabel());
-            // randomForestClassifier.Add(new CSVReader("test.txt").AsTestData());
-            // randomForestClassifier.Add(new CSVReader("testlabel.txt").AsTestLabel());
-            // randomForestClassifier.Train(8, 3, 0);
-            // randomForestClassifier.Save("randomForest.xml");
-
-            // logisticRegressionClassifier = new LogisticRegressionClassifier("lgr.xml");
-        }
-
-        static void MLTest()
-        {
-            var pipeline = new LearningPipeline();
-            pipeline.Add(new TextLoader("C:\\Users\\ali\\Downloads\\machinelearning-master\\machinelearning-master\\test\\data\\iris.txt").CreateFrom<SentimentData>(separator: ','));
-            pipeline.Add(new TextFeaturizer("Features", "SentimentText"));
-            pipeline.Add(new FastTreeBinaryClassifier());
-            var model = pipeline.Train<SentimentData, SentimentPrediction>();
-        }
-
-       
-
-        static void NumlTest()
-        {
-            Console.WriteLine("Hello World!");
-            var description = Descriptor.Create<Iris>();
-            Console.WriteLine(description);
-            var generator = new DecisionTreeGenerator();
-            var data = Iris.Load();
-            var model = generator.Generate(description, data);
-            Console.WriteLine("Generated model:");
-            Console.WriteLine(model);
-        }
-
-        static void AccordTest ()
-        {
-            int[] ysequence = new int[] { 1, 2, 3, 2 };
-
-            // this generates the correct Y for a given X
-            int CalcY(int x) => ysequence[(x - 1) % 4];
-
-            // this generates some inputs - just a few differnt mod of x
-            int[] CalcInputs(int x) => new int[] { x % 2, x % 3, x % 4, x % 5, x % 6 };
-
-
-            // build the training data set
-            int numtrainingcases = 12;
-            int[][] inputs = new int[numtrainingcases][];
-            int[] outputs = new int[numtrainingcases];
-
-            Console.WriteLine("\t\t\t\t x \t y");
-            for (int x = 1; x <= numtrainingcases; x++)
+            List<ExportedAction> ExportedActions = aRLEMDecipher.GetActivityActions();
+            if(ExportedActions.Count <= 0)
             {
-                int y = CalcY(x);
-                inputs[x - 1] = CalcInputs(x);
-                outputs[x - 1] = y;
-                Console.WriteLine("TrainingData \t " + x + "\t " + y);
+                Console.WriteLine("Activity does not have any actions that can be used to demonstrate this framework. So terminating the program.");
+                Console.ReadKey();
+                return;
+            }
+            ExportedAction CurrentAction = ExportedActions[0];
+            Console.ReadKey();
+
+            foreach(var d in ModuleDictionary)
+             {
+                d.Value.Config((dynamic output) =>
+                {
+                    // ModuleDictionary[CurrentAction.Module].DecisionToMessage((int)output);
+                    // Console.WriteLine(Array.Find(CurrentAction.ComparedValue, (x => x == output)));
+                    if (Array.Find(CurrentAction.ComparedValue, (x => x == output)) > 0)
+                    {
+                        bool activityFinished = true;
+                        ModuleDictionary[CurrentAction.Module].Stop();
+                        foreach (var exportedAction in ExportedActions)
+                        {
+                            if (exportedAction.Id == CurrentAction.NextAction)
+                            {
+                                switch (exportedAction.Id)
+                                {
+                                    case 36:
+                                        sendMQTT("/i5/hololens/car/tyre", "spin");
+                                    break;
+                                    case 40:
+                                        sendMQTT("/i5/car", "open");
+                                    break;
+                                    case 42:
+                                        sendMQTT("/i5/hololens/car/steering", "spin");
+                                        break;
+                                }
+                                ModuleDictionary[CurrentAction.Module].Stop();
+                                CurrentAction = exportedAction;
+                                Console.WriteLine(CurrentAction.Instruction);
+                                ModuleDictionary[CurrentAction.Module].Start();
+                                activityFinished = false;
+                               
+                                break;
+                            }
+                        }
+                        if (activityFinished)
+                        {
+                            Console.WriteLine("Activity Finished");
+                        }
+                    } else
+                    {
+                        Console.WriteLine(output);
+                    }
+                });
             }
 
-            // define how many values each input can have
-            DecisionVariable[] attributes =
-            {
-            new DecisionVariable("Mod2",2),
-            new DecisionVariable("Mod3",3),
-            new DecisionVariable("Mod4",4),
-            new DecisionVariable("Mod5",5),
-            new DecisionVariable("Mod6",6)
-        };
+            Console.WriteLine(CurrentAction.Instruction);
+            ModuleDictionary[CurrentAction.Module].Start();
+            Console.ReadKey();
 
-            // define how many outputs (+1 only because y doesn't use zero)
-            int classCount = outputs.Max() + 1;
-
-            // create the tree
-            DecisionTree tree = new DecisionTree(attributes, classCount);
-
-            // Create a new instance of the ID3 algorithm
-            ID3Learning id3learning = new ID3Learning(tree);
-
-            // Learn the training instances! Populates the tree
-            id3learning.Learn(inputs, outputs);
-
-            Console.WriteLine();
-            // now try to predict some cases that werent in the training data
-            for (int x = numtrainingcases + 1; x <= 2 * numtrainingcases; x++)
-            {
-                int[] query = CalcInputs(x);
-
-                int answer = tree.Decide(query); // makes the prediction
-
-                Console.WriteLine("Prediction \t\t " + x + "\t " + answer);
-            }
-
-            Console.WriteLine("Hello World!");
-            Console.ReadKey();        
         }
-    }
 
-    public class Iris
-    {
-        [Feature]
-        public decimal SepalLength { get; set; }
-        [Feature]
-        public decimal SepalWidth { get; set; }
-        [Feature]
-        public decimal PetalLength { get; set; }
-        [Feature]
-        public decimal PetalWidth { get; set; }
-        [StringLabel]
-        public string Class { get; set; }
-
-        public static Iris[] Load()
+        public static void sendMQTT(string path, string msg)
         {
-            return new Iris[]
-            {
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.5m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.9m, SepalWidth = 3m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.7m, SepalWidth = 3.2m, PetalLength = 1.3m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.6m, SepalWidth = 3.1m, PetalLength = 1.5m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.6m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.4m, SepalWidth = 3.9m, PetalLength = 1.7m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.6m, SepalWidth = 3.4m, PetalLength = 1.4m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.4m, PetalLength = 1.5m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.4m, SepalWidth = 2.9m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.9m, SepalWidth = 3.1m, PetalLength = 1.5m, PetalWidth = 0.1m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.4m, SepalWidth = 3.7m, PetalLength = 1.5m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.8m, SepalWidth = 3.4m, PetalLength = 1.6m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.8m, SepalWidth = 3m, PetalLength = 1.4m, PetalWidth = 0.1m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.3m, SepalWidth = 3m, PetalLength = 1.1m, PetalWidth = 0.1m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 4m, PetalLength = 1.2m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 4.4m, PetalLength = 1.5m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.4m, SepalWidth = 3.9m, PetalLength = 1.3m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.5m, PetalLength = 1.4m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 3.8m, PetalLength = 1.7m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.8m, PetalLength = 1.5m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.4m, SepalWidth = 3.4m, PetalLength = 1.7m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.7m, PetalLength = 1.5m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.6m, SepalWidth = 3.6m, PetalLength = 1m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.3m, PetalLength = 1.7m, PetalWidth = 0.5m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.8m, SepalWidth = 3.4m, PetalLength = 1.9m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3m, PetalLength = 1.6m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.4m, PetalLength = 1.6m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.2m, SepalWidth = 3.5m, PetalLength = 1.5m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.2m, SepalWidth = 3.4m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.7m, SepalWidth = 3.2m, PetalLength = 1.6m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.8m, SepalWidth = 3.1m, PetalLength = 1.6m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.4m, SepalWidth = 3.4m, PetalLength = 1.5m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.2m, SepalWidth = 4.1m, PetalLength = 1.5m, PetalWidth = 0.1m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 4.2m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.9m, SepalWidth = 3.1m, PetalLength = 1.5m, PetalWidth = 0.1m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.2m, PetalLength = 1.2m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 3.5m, PetalLength = 1.3m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.9m, SepalWidth = 3.1m, PetalLength = 1.5m, PetalWidth = 0.1m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.4m, SepalWidth = 3m, PetalLength = 1.3m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.4m, PetalLength = 1.5m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.5m, PetalLength = 1.3m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.5m, SepalWidth = 2.3m, PetalLength = 1.3m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.4m, SepalWidth = 3.2m, PetalLength = 1.3m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.5m, PetalLength = 1.6m, PetalWidth = 0.6m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.8m, PetalLength = 1.9m, PetalWidth = 0.4m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.8m, SepalWidth = 3m, PetalLength = 1.4m, PetalWidth = 0.3m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 3.8m, PetalLength = 1.6m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 4.6m, SepalWidth = 3.2m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5.3m, SepalWidth = 3.7m, PetalLength = 1.5m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 5m, SepalWidth = 3.3m, PetalLength = 1.4m, PetalWidth = 0.2m, Class = "Iris-setosa" },
-                new Iris { SepalLength = 7m, SepalWidth = 3.2m, PetalLength = 4.7m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 3.2m, PetalLength = 4.5m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.9m, SepalWidth = 3.1m, PetalLength = 4.9m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 2.3m, PetalLength = 4m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.5m, SepalWidth = 2.8m, PetalLength = 4.6m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 2.8m, PetalLength = 4.5m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 3.3m, PetalLength = 4.7m, PetalWidth = 1.6m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 4.9m, SepalWidth = 2.4m, PetalLength = 3.3m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.6m, SepalWidth = 2.9m, PetalLength = 4.6m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.2m, SepalWidth = 2.7m, PetalLength = 3.9m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5m, SepalWidth = 2m, PetalLength = 3.5m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.9m, SepalWidth = 3m, PetalLength = 4.2m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6m, SepalWidth = 2.2m, PetalLength = 4m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.1m, SepalWidth = 2.9m, PetalLength = 4.7m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.6m, SepalWidth = 2.9m, PetalLength = 3.6m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3.1m, PetalLength = 4.4m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.6m, SepalWidth = 3m, PetalLength = 4.5m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 2.7m, PetalLength = 4.1m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.2m, SepalWidth = 2.2m, PetalLength = 4.5m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.6m, SepalWidth = 2.5m, PetalLength = 3.9m, PetalWidth = 1.1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.9m, SepalWidth = 3.2m, PetalLength = 4.8m, PetalWidth = 1.8m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.1m, SepalWidth = 2.8m, PetalLength = 4m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 2.5m, PetalLength = 4.9m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.1m, SepalWidth = 2.8m, PetalLength = 4.7m, PetalWidth = 1.2m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 2.9m, PetalLength = 4.3m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.6m, SepalWidth = 3m, PetalLength = 4.4m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.8m, SepalWidth = 2.8m, PetalLength = 4.8m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3m, PetalLength = 5m, PetalWidth = 1.7m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6m, SepalWidth = 2.9m, PetalLength = 4.5m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 2.6m, PetalLength = 3.5m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 2.4m, PetalLength = 3.8m, PetalWidth = 1.1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 2.4m, PetalLength = 3.7m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 2.7m, PetalLength = 3.9m, PetalWidth = 1.2m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6m, SepalWidth = 2.7m, PetalLength = 5.1m, PetalWidth = 1.6m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.4m, SepalWidth = 3m, PetalLength = 4.5m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6m, SepalWidth = 3.4m, PetalLength = 4.5m, PetalWidth = 1.6m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3.1m, PetalLength = 4.7m, PetalWidth = 1.5m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 2.3m, PetalLength = 4.4m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.6m, SepalWidth = 3m, PetalLength = 4.1m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 2.5m, PetalLength = 4m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.5m, SepalWidth = 2.6m, PetalLength = 4.4m, PetalWidth = 1.2m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.1m, SepalWidth = 3m, PetalLength = 4.6m, PetalWidth = 1.4m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 2.6m, PetalLength = 4m, PetalWidth = 1.2m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5m, SepalWidth = 2.3m, PetalLength = 3.3m, PetalWidth = 1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.6m, SepalWidth = 2.7m, PetalLength = 4.2m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 3m, PetalLength = 4.2m, PetalWidth = 1.2m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 2.9m, PetalLength = 4.2m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.2m, SepalWidth = 2.9m, PetalLength = 4.3m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.1m, SepalWidth = 2.5m, PetalLength = 3m, PetalWidth = 1.1m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 2.8m, PetalLength = 4.1m, PetalWidth = 1.3m, Class = "Iris-versicolor" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 3.3m, PetalLength = 6m, PetalWidth = 2.5m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 2.7m, PetalLength = 5.1m, PetalWidth = 1.9m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.1m, SepalWidth = 3m, PetalLength = 5.9m, PetalWidth = 2.1m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 2.9m, PetalLength = 5.6m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.5m, SepalWidth = 3m, PetalLength = 5.8m, PetalWidth = 2.2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.6m, SepalWidth = 3m, PetalLength = 6.6m, PetalWidth = 2.1m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 4.9m, SepalWidth = 2.5m, PetalLength = 4.5m, PetalWidth = 1.7m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.3m, SepalWidth = 2.9m, PetalLength = 6.3m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 2.5m, PetalLength = 5.8m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.2m, SepalWidth = 3.6m, PetalLength = 6.1m, PetalWidth = 2.5m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.5m, SepalWidth = 3.2m, PetalLength = 5.1m, PetalWidth = 2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 2.7m, PetalLength = 5.3m, PetalWidth = 1.9m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.8m, SepalWidth = 3m, PetalLength = 5.5m, PetalWidth = 2.1m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 5.7m, SepalWidth = 2.5m, PetalLength = 5m, PetalWidth = 2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 2.8m, PetalLength = 5.1m, PetalWidth = 2.4m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 3.2m, PetalLength = 5.3m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.5m, SepalWidth = 3m, PetalLength = 5.5m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.7m, SepalWidth = 3.8m, PetalLength = 6.7m, PetalWidth = 2.2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.7m, SepalWidth = 2.6m, PetalLength = 6.9m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6m, SepalWidth = 2.2m, PetalLength = 5m, PetalWidth = 1.5m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.9m, SepalWidth = 3.2m, PetalLength = 5.7m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 5.6m, SepalWidth = 2.8m, PetalLength = 4.9m, PetalWidth = 2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.7m, SepalWidth = 2.8m, PetalLength = 6.7m, PetalWidth = 2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 2.7m, PetalLength = 4.9m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3.3m, PetalLength = 5.7m, PetalWidth = 2.1m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.2m, SepalWidth = 3.2m, PetalLength = 6m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.2m, SepalWidth = 2.8m, PetalLength = 4.8m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.1m, SepalWidth = 3m, PetalLength = 4.9m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 2.8m, PetalLength = 5.6m, PetalWidth = 2.1m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.2m, SepalWidth = 3m, PetalLength = 5.8m, PetalWidth = 1.6m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.4m, SepalWidth = 2.8m, PetalLength = 6.1m, PetalWidth = 1.9m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.9m, SepalWidth = 3.8m, PetalLength = 6.4m, PetalWidth = 2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 2.8m, PetalLength = 5.6m, PetalWidth = 2.2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 2.8m, PetalLength = 5.1m, PetalWidth = 1.5m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.1m, SepalWidth = 2.6m, PetalLength = 5.6m, PetalWidth = 1.4m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 7.7m, SepalWidth = 3m, PetalLength = 6.1m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 3.4m, PetalLength = 5.6m, PetalWidth = 2.4m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.4m, SepalWidth = 3.1m, PetalLength = 5.5m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6m, SepalWidth = 3m, PetalLength = 4.8m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.9m, SepalWidth = 3.1m, PetalLength = 5.4m, PetalWidth = 2.1m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3.1m, PetalLength = 5.6m, PetalWidth = 2.4m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.9m, SepalWidth = 3.1m, PetalLength = 5.1m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 5.8m, SepalWidth = 2.7m, PetalLength = 5.1m, PetalWidth = 1.9m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.8m, SepalWidth = 3.2m, PetalLength = 5.9m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3.3m, PetalLength = 5.7m, PetalWidth = 2.5m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.7m, SepalWidth = 3m, PetalLength = 5.2m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.3m, SepalWidth = 2.5m, PetalLength = 5m, PetalWidth = 1.9m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.5m, SepalWidth = 3m, PetalLength = 5.2m, PetalWidth = 2m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 6.2m, SepalWidth = 3.4m, PetalLength = 5.4m, PetalWidth = 2.3m, Class = "Iris-virginica" },
-                new Iris { SepalLength = 5.9m, SepalWidth = 3m, PetalLength = 5.1m, PetalWidth = 1.8m, Class = "Iris-virginica" },
-            };
+            var Client = new MqttClient("iot.eclipse.org");
+            Client.Connect(Guid.NewGuid().ToString());
+            Client.Publish(path, Encoding.UTF8.GetBytes(msg));
         }
+
     }
 }

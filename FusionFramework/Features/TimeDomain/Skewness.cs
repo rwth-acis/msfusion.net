@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FusionFramework.Features.TimeDomain
+﻿namespace FusionFramework.Features.TimeDomain
 {
-    class Skewness : IFeature
+    public class Skewness : IFeature
     {
+        public Skewness()
+        {
+
+        }
+
+        public Skewness(params int[] columns)
+        {
+            UseColumns = columns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             return Accord.Statistics.Measures.Skewness(data);

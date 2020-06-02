@@ -4,8 +4,18 @@ using System.Text;
 
 namespace FusionFramework.Features.Complex
 {
-    class MeanAbsoluteDeviation : IFeature
+    public class MeanAbsoluteDeviation : IFeature
     {
+        public MeanAbsoluteDeviation()
+        {
+
+        }
+
+        public MeanAbsoluteDeviation(params int[] columns)
+        {
+            UseColumns = columns;
+        }
+
         public override dynamic Calculate(dynamic data)
         {
             double MAD = 0.0;
